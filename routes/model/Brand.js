@@ -33,9 +33,14 @@ BrandSchma.statics.getBrandById = function (id,callback) {
     this.findOne({"_id":id}).then(callback);
 };
 
+BrandSchma.statics.deleteBrandById = function (id,callback) {
+    this.remove({"_id":id}).then(callback);
+};
+
 BrandSchma.statics.getRecommentBrand = function (callback) {
     this.find({"recommend":"1"}).then(callback);
 };
+
 
 BrandSchma.statics.getBrandByName = function (name,callback) {
     this.findOne({"name":name}).then(callback);

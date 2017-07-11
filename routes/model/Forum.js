@@ -31,6 +31,10 @@ ForumSchma.statics.getForumById = function (id,callback) {
     this.findOne({"_id":id}).then(callback);
 };
 
+ForumSchma.statics.deleteForumById = function (id,callback) {
+    this.remove({"_id":id}).then(callback);
+};
+
 ForumSchma.statics.getItemsByConditions = function (conditions,callback) {
     this.find(conditions).then(callback);
 };

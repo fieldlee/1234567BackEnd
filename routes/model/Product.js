@@ -47,6 +47,10 @@ ProductSchma.statics.getProductById = function (id,cb) {
     this.findOne({"_id":id}).then(cb);
 };
 
+ProductSchma.statics.deleteProductById = function (id,cb) {
+    this.remove({"_id":id}).then(cb);
+};
+
 ProductSchma.statics.getAll = function (cb) {
     this.find({}).then(cb);
 };

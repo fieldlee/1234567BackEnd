@@ -41,6 +41,10 @@ ForumAcitonSchma.statics.getActionById = function (id,cb) {
     this.findOne({"_id":id}).then(cb);
 };
 
+ForumAcitonSchma.statics.deleteActionById = function (id,cb) {
+    this.remove({"_id":id}).then(cb);
+};
+
 ForumAcitonSchma.statics.getItemsByConditions = function (conditions,callback) {
     this.find(conditions).then(callback);
 };

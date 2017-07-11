@@ -69,6 +69,23 @@ router.post('/', function(req, res) {
 
 });
 
+router.post('/delete', function(req, res) {
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+    if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
+        News.deleteNewsById(requestJson["_id"],function (result) {
+            if (result.result.ok == 1){
+                var jsonResult = {"success": true};
+                res.json(jsonResult);
+            }
+            var jsonResult = {"success": false};
+            res.json(jsonResult);
+        });
+    }
+});
 
 
 module.exports = router;

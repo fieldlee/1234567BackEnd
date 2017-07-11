@@ -32,6 +32,10 @@ AdsSchma.statics.getAdsById = function (id,callback) {
     this.findOne({"_id":id}).then(callback);
 };
 
+AdsSchma.statics.deleteAdsById = function (id,callback) {
+    this.remove({"_id":id}).then(callback);
+};
+
 AdsSchma.statics.getAll = function (callback) {
     this.find({}).then(callback);
 };

@@ -32,6 +32,10 @@ NewsSchma.statics.getNewsById = function (id,cb) {
     this.findOne({"_id":id}).then(cb);
 };
 
+NewsSchma.statics.deleteNewsById = function (id,cb) {
+    this.remove({"_id":id}).then(cb);
+};
+
 NewsSchma.statics.getAll = function (cb) {
     this.find({}).then(cb);
 };
