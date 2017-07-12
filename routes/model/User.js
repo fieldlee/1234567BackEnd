@@ -22,7 +22,7 @@ var UserSchma = new mongoose.Schema({
     admin: String,
     password:String,
     phone:String,
-    email:Date,
+    email:String,
     registerTime:Date,
     avator:String
 });

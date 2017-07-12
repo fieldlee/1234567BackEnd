@@ -9,6 +9,7 @@ var passport = require('passport');
 var router = express.Router();
 
 router.use('/register', require('./register'));
-
+router.use('/login', require('./login'));
+router.use('/forget', require('./forget'));
 //exports
 module.exports = router;

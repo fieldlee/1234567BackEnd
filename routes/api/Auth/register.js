@@ -6,7 +6,7 @@
  */
 var express = require('express');
 var router = express.Router();
-
+var config = require('../config');
 var User = require('../../model/User');
 
 /* GET users listing. */
@@ -35,6 +35,8 @@ router.get('/:key', function(req, res) {
 
 router.post('/', function(req, res) {
     var body = req.body;
+    console.log("*****");
+    console.log(body);
     var requestJson = body;
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
@@ -58,7 +60,16 @@ router.post('/', function(req, res) {
             result.avator = requestJson["avator"];
             result.add(function (err) {
                 console.log(err);
-                var jsonResult = {"success": true,"data":result};
+                var token;
+                if(requestJson["phone"]){
+                    token = config.getToken(requestJson["phone"]);
+                }else{
+                    token = config.getToken(requestJson["email"]);
+                }
+
+
+                var jsonResult = {"success": true,"data":result,"token":token};
+
                 res.json(jsonResult);
             });
             // ads = result;
@@ -73,7 +84,14 @@ router.post('/', function(req, res) {
         user.registerTime = new Date();
         user.add(function (err) {
             console.log(err);
-            var jsonResult = {"success": true,"data":user};
+            var token;
+            if(requestJson["phone"]){
+                token = config.getToken(requestJson["phone"]);
+            }else{
+                token = config.getToken(requestJson["email"]);
+            }
+            var jsonResult = {"success": true,"data":user,"token":token};
+
             res.json(jsonResult);
         })
     }

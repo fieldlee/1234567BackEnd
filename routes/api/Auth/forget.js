@@ -33,17 +33,8 @@ router.post('/', function(req, res) {
     if (requestJson["type"]=="phone"){
         User.getUserByPhone(requestJson["phone"],function (result) {
             if(result){
-                if (result.password == requestJson["password"]){
-                    var token = config.getToken(requestJson["phone"]);
-                    var jsonResult = {"success": true,"data":result,token:token};
-
-                    res.json(jsonResult);
-                    return;
-                }else{
-                    var jsonResult = {"success": false,"message":"密码不正确,请重新输入！"};
-                    res.json(jsonResult);
-                    return;
-                }
+                var jsonResult = {"success": true,"message":"密码已经通过短信发送到手机，请及时查收短信信息！"};
+                res.json(jsonResult);
             }else{
                 var jsonResult = {"success": false,"message":"用户名不存在，请先注册！"};
                 res.json(jsonResult);
@@ -56,17 +47,8 @@ router.post('/', function(req, res) {
         User.getUserByMail(requestJson["email"],function (result) {
             if(result){
                 console.log(result);
-                if (result.password == requestJson["password"]){
-                    var token = config.getToken(requestJson["phone"]);
-                    var jsonResult = {"success": true,"data":result,token:token};
-
-                    res.json(jsonResult);
-                    return;
-                }else{
-                    var jsonResult = {"success": false,"message":"密码不正确,请重新输入！"};
-                    res.json(jsonResult);
-                    return;
-                }
+                var jsonResult = {"success": true,"message":"密码已经发送到邮箱，请及时查收邮件！"};
+                res.json(jsonResult);
             }else{
                 var jsonResult = {"success": false,"message":"用户名不存在，请先注册！"};
                 res.json(jsonResult);
@@ -79,4 +61,5 @@ router.post('/', function(req, res) {
 });
 
 module.exports = router;
+
 
