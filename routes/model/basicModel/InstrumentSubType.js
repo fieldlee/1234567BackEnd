@@ -24,6 +24,7 @@ var InstrumentSubTypeSchma = new mongoose.Schema({
     id: String,
     type: String,
     subType:String,
+    regional:String, // 中国乐器 / 西洋乐器
     configs:[]
 });
 
@@ -33,6 +34,10 @@ InstrumentSubTypeSchma.methods.add = function (callback) {
 
 InstrumentSubTypeSchma.statics.deleteByType = function (type,callback) {
     this.find({"type":type}).then(callback);
+};
+
+InstrumentSubTypeSchma.statics.getAllSubType = function (callback) {
+    this.find({}).then(callback);
 };
 
 InstrumentSubTypeSchma.statics.getAllByType = function (type,callback) {

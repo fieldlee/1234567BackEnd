@@ -4,6 +4,18 @@
 'use strict';
 var jwt    = require('jsonwebtoken');
 
+Date.prototype.yyyymmdd = function() {
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
+
+    return [this.getFullYear(),
+        (mm>9 ? '' : '0') + mm,
+        (dd>9 ? '' : '0') + dd
+    ].join('-');
+};
+
+var date = new Date();
+date.yyyymmdd();
 module.exports = {
     getDatabase: function () {
         return 'mongodb://localhost:27017/instrument?socketTimeoutMS=200000';
@@ -16,10 +28,12 @@ module.exports = {
         return token;
     },
     verifyToken: function (req) {
-        var token = req.body.token || req.query.token || req.headers['x-access-token'];
+        var token = req.headers['x-access-token'];
         // decode token
         if (token) {
             try {
+                console.log("verifyToken:");
+                console.log(jwt.verify(token, this.tokenSecret));
                 return jwt.verify(token, this.tokenSecret);
             } catch (err) {
                 return false;
@@ -27,5 +41,47 @@ module.exports = {
         } else {
             return false;
         }
+    },
+    getUsername: function (req) {
+        var token = req.body.token || req.query.token || req.headers['x-access-token'];
+        // decode token
+        if (token) {
+            try {
+                var userJson = jwt.verify(token, this.tokenSecret);//{username: username}
+                return userJson["username"];
+            } catch (err) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    },
+    isMail:function(str) {
+        var reg = /^([a-za-z0-9]+[_|-|.]?)*[a-za-z0-9]+@([a-za-z0-9]+[_|-|.]?)*[a-za-z0-9]+.[a-za-z]{2,3}$/;
+        return reg.test(str);
+    },
+    isPhone:function (str) {
+
+        var reg = /^1(3|4|5|7|8)\d{9}$/;
+        return reg.test(str);
+    },
+    preTime:function (date) {
+        var now = new Date();
+        //var d2 = new Date(stamp);
+        //计算当前时间距结束时间多少秒
+        var seconds = parseInt(now - date)/1000;
+
+        //计算相差多少天
+        var day = parseInt(seconds/86400);//获得天数
+        var hour = parseInt(seconds/3600-day*24);//获得小时数
+        var minute = parseInt(seconds/60-(hour*60+day*1440));//获得分钟数
+        if(minute<=60)
+            return minute + "分钟之前";
+        else if(hour<=24)
+            return hour + "小时之前";
+        else if (day<=30)
+            return day + "天之前";
+        else
+            return date.yyyymmdd();
     }
 };

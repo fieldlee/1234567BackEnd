@@ -31,6 +31,12 @@ router.get('/', function(req, res) {
     });
 });
 
+router.get('/allsubtype', function(req, res) {
+    InstrumentSubTypeSchma.getAllSubType(function (results) {
+        var jsonResult = {success: true, results: results};
+        res.json(jsonResult);
+    });
+});
 
 router.get('/:type', function(req, res) {
     var type = req.params.type;

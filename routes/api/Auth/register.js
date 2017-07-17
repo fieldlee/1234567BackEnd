@@ -11,16 +11,13 @@ var User = require('../../model/User');
 
 /* GET users listing. */
 
-function isMail(str) {
-    var re = /^([a-za-z0-9]+[_|-|.]?)*[a-za-z0-9]+@([a-za-z0-9]+[_|-|.]?)*[a-za-z0-9]+.[a-za-z]{2,3}$/;
-    return re.test(str);
-}
+
 
 // req.params.type
 router.get('/:key', function(req, res) {
     var key = req.params.key;
     key = key.trim();
-    if (isMail(key)){
+    if (config.isMail(key)){
         User.getNewsByMail(key,function (result) {
             var jsonResult = {"success": true,"data":result};
             res.json(jsonResult);
@@ -42,7 +39,17 @@ router.post('/', function(req, res) {
         requestJson = JSON.parse(body);
     }
     console.log(requestJson);
-
+    if (config.isMail(requestJson["username"])){
+        requestJson["email"] = requestJson["username"];
+    }else{
+        if (config.isPhone(requestJson["username"])){
+            requestJson["phone"] = requestJson["username"];
+        }else{
+            var jsonResult = {"success": false,"message":"请输入正确的邮箱或手机号码"};
+            res.json(jsonResult);
+            return
+        }
+    }
     console.log(requestJson["_id"]);
     // username: String,
     //     admin: String,
@@ -60,13 +67,7 @@ router.post('/', function(req, res) {
             result.avator = requestJson["avator"];
             result.add(function (err) {
                 console.log(err);
-                var token;
-                if(requestJson["phone"]){
-                    token = config.getToken(requestJson["phone"]);
-                }else{
-                    token = config.getToken(requestJson["email"]);
-                }
-
+                var token = config.getToken(requestJson["username"]);
 
                 var jsonResult = {"success": true,"data":result,"token":token};
 
@@ -82,14 +83,20 @@ router.post('/', function(req, res) {
         user.email = requestJson["email"];
         user.avator = requestJson["avator"];
         user.registerTime = new Date();
+        if (requestJson["avatorPath"]){
+            user.avatorPath = requestJson["avatorPath"];
+        }else{
+            user.avatorPath = "./public/img/boy1.png";
+        }
+        if (requestJson["backgroundPath"]){
+            user.backgroundPath = requestJson["backgroundPath"];
+        }else{
+            user.backgroundPath = "./public/img/background1.png";
+        }
         user.add(function (err) {
             console.log(err);
-            var token;
-            if(requestJson["phone"]){
-                token = config.getToken(requestJson["phone"]);
-            }else{
-                token = config.getToken(requestJson["email"]);
-            }
+            var token= config.getToken(requestJson["username"]);
+
             var jsonResult = {"success": true,"data":user,"token":token};
 
             res.json(jsonResult);

@@ -24,7 +24,17 @@ var UserSchma = new mongoose.Schema({
     phone:String,
     email:String,
     registerTime:Date,
-    avator:String
+    avator:String,
+    avatorPath:String,
+    backgroundPath:String,
+    birthday:Date,
+    province:String,
+    city:String,
+    district:String,
+    address:String,
+    sex:String,
+    focus:Array,
+    skills:Array
 });
 
 UserSchma.methods.add = function (cb) {
@@ -33,6 +43,10 @@ UserSchma.methods.add = function (cb) {
 
 UserSchma.statics.getUserById = function (id,cb) {
     this.findOne({"_id":id}).then(cb);
+};
+
+UserSchma.statics.getUserByUserName = function (id,cb) {
+    this.findOne({"username":id}).then(cb);
 };
 
 UserSchma.statics.getUserByPhone = function (id,cb) {

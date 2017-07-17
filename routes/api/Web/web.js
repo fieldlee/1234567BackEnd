@@ -18,20 +18,23 @@ router.use(function (req,res,next) {
 router.use('/file', require('./file'));
 router.use('/upload', require('./upload'));
 router.use('/forum', require('./forum'));
+router.use('/brand', require('./brand'));
 
-router.use(function(req, res, next) {
-    if (config.verifyToken(req)){
-        next();
-    }else{
-        var jsonResult = {"success": false,"message":"请您登录后，再继续操作吧！"};
-        res.json(jsonResult);
-    }
-});
+// router.use(function(req, res, next) {
+//     console.log(config.verifyToken(req));
+//     if (config.verifyToken(req)){
+//         console.log("head token had got");
+//         next();
+//     }else{
+//         var jsonResult = {"success": false,"message":"请您登录后，再继续操作吧！"};
+//         res.json(jsonResult);
+//     }
+// });
 
 router.use('/ads', require('./ads'));
 router.use('/news', require('./news'));
 router.use('/action', require('./action'));
-router.use('/brand', require('./brand'));
+
 router.use('/product', require('./product'));
 
 //exports

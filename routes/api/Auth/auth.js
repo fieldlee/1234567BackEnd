@@ -11,5 +11,6 @@ var router = express.Router();
 router.use('/register', require('./register'));
 router.use('/login', require('./login'));
 router.use('/forget', require('./forget'));
+router.use('/user', require('./user'));
 //exports
 module.exports = router;
