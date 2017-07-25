@@ -49,6 +49,14 @@ UserSchma.statics.getUserByUserName = function (id,cb) {
     this.findOne({"username":id}).then(cb);
 };
 
+UserSchma.statics.getUserByObj = function (obj,cb) {
+    console.log(obj);
+    this.findOne({"username":obj.author}).then(function (result) {
+        console.log(result);
+        cb(result,obj);
+    });
+};
+
 UserSchma.statics.getUserByPhone = function (id,cb) {
     this.findOne({"phone":id}).then(cb);
 };

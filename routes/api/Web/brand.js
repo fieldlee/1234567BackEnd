@@ -3,16 +3,42 @@
  */
 var express = require('express');
 var router = express.Router();
-
+var async = require('async');
 var Brand = require('../../model/Brand');
-
+var Product = require('../../model/Product');
 /* GET users listing. */
 // req.params.type
 router.get('/', function(req, res) {
+
+    var handResults = new Array();
     Brand.getAll(function (results) {
-        console.log(results);
-        var jsonResult = {"success":true,"results":results};
-        res.json(jsonResult);
+        async.map(results,function (result,callback) {
+
+            Product.getDistinct(result.name,function (subtypes) {
+                var tmpResult = result;
+                async.map(subtypes,function (item,callback2) {
+                    var objProduct = new Object();
+                    Product.getProductsByBrandAndSubType(tmpResult.name,item,function (subResults) {
+
+                        objProduct[item] = subResults;
+
+                        callback2(null,objProduct);
+                    })
+                },function (err2,obj) {
+
+                    tmpResult.products = obj;
+
+                    callback(null,tmpResult);
+                });
+            });
+
+        },function(err,handitems) {
+            if (handitems.length == results.length){
+                var jsonResult = {"success": true,"results":handitems};
+                res.json(jsonResult);
+                return;
+            }
+        });
     });
 });
 
@@ -35,7 +61,14 @@ router.post('/', function(req, res) {
             result.name =   requestJson["name"];
             result.company =   requestJson["company"];
             result.address =   requestJson["address"];
+            result.province =   requestJson["province"];
+
+            result.char =   requestJson["char"].trim().toUpperCase();
+            result.city =   requestJson["city"];
+            result.district =   requestJson["district"];
             result.tel =   requestJson["tel"];
+            result.url =   requestJson["url"];
+            result.fax =   requestJson["fax"];
             result.email =   requestJson["email"];
             result.content =   requestJson["content"];
             result.recommend = requestJson["recommend"];
@@ -50,8 +83,14 @@ router.post('/', function(req, res) {
         brand.icon =   requestJson["icon"];
         brand.name =   requestJson["name"];
         brand.company =   requestJson["company"];
+        brand.province =   requestJson["province"];
+        brand.city =   requestJson["city"];
+        brand.char =   requestJson["char"].trim().toUpperCase();
+        brand.district =   requestJson["district"];
         brand.address =   requestJson["address"];
         brand.tel =   requestJson["tel"];
+        brand.url =   requestJson["url"];
+        brand.fax =   requestJson["fax"];
         brand.email =   requestJson["email"];
         brand.content =   requestJson["content"];
         brand.recommend = requestJson["recommend"];
@@ -70,7 +109,7 @@ router.post('/delete', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    // icon:String,
+    //     icon:String,
     //     name: String,
     //     company: String,
     //     address:String,

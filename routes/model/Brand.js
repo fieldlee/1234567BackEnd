@@ -18,11 +18,18 @@ var BrandSchma = new mongoose.Schema({
     icon:String,
     name: String,
     company: String,
+    char:String,
+    province:String,
+    city:String,
+    district:String,
     address:String,
     tel:String,
     email:String,
+    url:String,
+    fax:String,
     content:String,
-    recommend:String
+    recommend:String,
+    products:Object
 });
 
 BrandSchma.methods.add = function (callback) {

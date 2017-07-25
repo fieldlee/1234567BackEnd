@@ -12,5 +12,6 @@ router.use('/register', require('./register'));
 router.use('/login', require('./login'));
 router.use('/forget', require('./forget'));
 router.use('/user', require('./user'));
+router.use('/changepassword', require('./changepassword'));
 //exports
 module.exports = router;

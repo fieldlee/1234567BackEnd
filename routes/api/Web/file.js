@@ -16,10 +16,10 @@ var rootPath = "/uploads/formupload/";
 // req.params.type
 router.delete('/:imagepath',function (req,res) {
     var imagepath = req.params.imagepath;
-    console.log(imagepath);
+
     imagepath = rootPath + imagepath;
     var filepath = path.join(path.join(path.dirname(path.dirname(require.main.filename)),"public"), imagepath);
-    console.log(filepath);
+
     fs.unlink(filepath, function (err) {
         if (err) {
             res.json({"success":false});
@@ -39,14 +39,13 @@ router.post('/delete',function (req,res) {
 
     if (requestJson["imagepath"] != null && requestJson["imagepath"] != "" && requestJson["imagepath"] != undefined ){
         Image.removeImageByPath(requestJson["imagepath"],function (result) {
-            console.log(result.result.ok);
 
             if (result.result.ok !== 1){
                 res.json({success:false})
             }
 
             var filepath = path.join(path.join(path.dirname(path.dirname(require.main.filename)),"public"), requestJson["imagepath"]);
-            console.log(filepath);
+
             fs.stat(filepath, function(err, stat) {
                 if(err == null) {
                     if(stat.isFile()) {
@@ -73,7 +72,7 @@ router.post('/delete',function (req,res) {
 });
 
 router.post('/',function(req,res){
-    console.log("app web file upload");
+
     var fileName = "";
     var originName = "";
     var storage =   multer.diskStorage({

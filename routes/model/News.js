@@ -16,12 +16,22 @@ var db = mongoose.createConnection(config.getDatabase());
 
 var NewsSchma = new mongoose.Schema({
     title: String,
+    brand:{ type: String, default: "" },
+    product:String,
     type: String,
+    subType:String,
+    tags:Array,
     content:String,
-    author:String,
+    author:{ type: String, default: "" },
+    avator:{ type: String, default: "" },
+    avatorPath:{ type: String, default: "" },
     issueTime:Date,
-    avator:String,
-    images:Array
+    fromTime:{ type: String, default: "" },
+    images:Array,
+    videos:Array,
+    comment:{ type: Number, default: 0 },
+    read:{ type: Number, default: 0 },
+    support:{ type: Number, default: 0 }
 });
 
 NewsSchma.methods.add = function (cb) {

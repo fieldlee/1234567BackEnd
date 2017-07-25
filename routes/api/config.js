@@ -24,7 +24,7 @@ module.exports = {
     successJson: {"success": true},
     failJson: {"success": false},
     getToken: function (username) {
-        var token = jwt.sign({username: username}, this.tokenSecret, { expiresIn: '365 days' });
+        var token = jwt.sign({"username":username}, this.tokenSecret, { expiresIn: '365 days'});
         return token;
     },
     verifyToken: function (req) {
@@ -47,7 +47,8 @@ module.exports = {
         // decode token
         if (token) {
             try {
-                var userJson = jwt.verify(token, this.tokenSecret);//{username: username}
+                var userJson = jwt.decode(token, this.tokenSecret);//{username: username}
+                console.log(userJson);
                 return userJson["username"];
             } catch (err) {
                 return false;
@@ -66,22 +67,34 @@ module.exports = {
         return reg.test(str);
     },
     preTime:function (date) {
+
+        var oldDate = new Date(date);
+
         var now = new Date();
         //var d2 = new Date(stamp);
         //计算当前时间距结束时间多少秒
-        var seconds = parseInt(now - date)/1000;
+        var seconds = parseInt(now - oldDate)/1000;
 
         //计算相差多少天
         var day = parseInt(seconds/86400);//获得天数
         var hour = parseInt(seconds/3600-day*24);//获得小时数
         var minute = parseInt(seconds/60-(hour*60+day*1440));//获得分钟数
-        if(minute<=60)
-            return minute + "分钟之前";
-        else if(hour<=24)
-            return hour + "小时之前";
-        else if (day<=30)
-            return day + "天之前";
-        else
+        if(day>30){
             return date.yyyymmdd();
+        }else if(day>1 && day<=30){
+            return day + "天前";
+        }else if(hour>1 && hour<=24){
+            return hour + "小时前";
+        }else{
+            return minute + "分钟前";
+        }
+        // if(minute<=60)
+        //     return minute + "分钟前";
+        // else if(hour<=24)
+        //     return hour + "小时前";
+        // else if (day<=30)
+        //     return day + "天前";
+        // else
+        //     return date.yyyymmdd();
     }
 };

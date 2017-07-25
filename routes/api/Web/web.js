@@ -19,7 +19,7 @@ router.use('/file', require('./file'));
 router.use('/upload', require('./upload'));
 router.use('/forum', require('./forum'));
 router.use('/brand', require('./brand'));
-
+router.use('/comment', require('./comment'));
 // router.use(function(req, res, next) {
 //     console.log(config.verifyToken(req));
 //     if (config.verifyToken(req)){
@@ -34,8 +34,8 @@ router.use('/brand', require('./brand'));
 router.use('/ads', require('./ads'));
 router.use('/news', require('./news'));
 router.use('/action', require('./action'));
-
 router.use('/product', require('./product'));
-
+router.use('/follow', require('./follow'));
+router.use('/praise', require('./praise'));
 //exports
 module.exports = router;

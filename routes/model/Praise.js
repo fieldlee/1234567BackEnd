@@ -15,15 +15,21 @@ mongoose.Promise = Promise;
 var db = mongoose.createConnection(config.getDatabase());
 
 var PraiseSchma = new mongoose.Schema({
-    id: String,
+    chenghu:String,
     product: String,
     author: String,
     telephone: String,
     delegate:String,
-    provice:String,
+    province:String,
     city:String,
+    district:String,
     content:String,
-    selectdPraise:Array,
+    best:String,
+    bad:String,
+    praisetitles:Array,
+    praisevalues:Array,
+    praisestars:Array,
+    fromTime:String,
     issueTime:Date
 });
 
@@ -33,6 +39,10 @@ PraiseSchma.methods.add = function (cb) {
 
 PraiseSchma.statics.getPraiseByProductId = function (id,cb) {
     this.find({"product":id}).then(cb);
+};
+
+PraiseSchma.statics.getPraiseById = function (id,cb) {
+    this.find({"_id":id}).then(cb);
 };
 
 PraiseSchma.statics.getAll = function (cb) {

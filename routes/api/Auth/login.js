@@ -32,7 +32,7 @@ router.post('/', function(req, res) {
         User.getUserByUserName(requestJson["username"],function (result) {
             if(result){
                 if (result.password == requestJson["password"]){
-                    var token = config.getToken(requestJson["phone"]);
+                    var token = config.getToken(requestJson["username"]);
                     var jsonResult = {"success": true,"data":result,token:token};
                     res.json(jsonResult);
                     return;

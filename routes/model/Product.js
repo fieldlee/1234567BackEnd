@@ -27,6 +27,8 @@ var ProductSchma = new mongoose.Schema({
     status:String,
     recomment:String,
     content:String, // 产品介绍
+    appearimages:Array,
+    detailimages:Array,
     images:Array,   // 产品的图片
     delegates:Array, // 代理的琴行
     config: {}, // 产品的config 比较
@@ -41,6 +43,19 @@ ProductSchma.methods.add = function (cb) {
 ProductSchma.statics.getValid = function (cb) {
     this.find({"status":"insale"})
         .then(cb);
+};
+
+ProductSchma.statics.getProductsByBrand = function (brand,cb) {
+    this.find({"brand":brand}).then(cb);
+};
+
+ProductSchma.statics.getProductsByBrandAndSubType = function (brand,subtype,cb) {
+    this.find({"brand":brand,"subType":subtype}).then(cb);
+};
+
+ProductSchma.statics.getDistinct = function (brand,cb) {
+    this.distinct('subType',{"brand":brand}).then(cb);
+    // this.find({"brand":brand}).then(cb);
 };
 
 ProductSchma.statics.getProductById = function (id,cb) {

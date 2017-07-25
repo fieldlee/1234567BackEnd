@@ -19,6 +19,14 @@ router.get('/', function(req, res) {
     });
 });
 
+router.get('/:id', function(req, res) {
+    Product.getProductById(req.param("id"),function (result) {
+        var jsonResult = {"success":true,"data":result};
+        res.json(jsonResult);
+        return;
+    });
+});
+
 router.post('/', function(req, res) {
     console.log("=====product=====");
     var body = req.body;
@@ -48,6 +56,8 @@ router.post('/', function(req, res) {
             result.recomment =   requestJson["recomment"];
             result.content =   requestJson["content"];
             result.images = requestJson["images"];
+            result.appearimages = requestJson["appearimages"];
+            result.detailimages = requestJson["detailimages"];
             result.delegates = requestJson["delegates"];
             result.config = requestJson["config"];
             result.praise = requestJson["praise"];
@@ -68,6 +78,8 @@ router.post('/', function(req, res) {
         result.recomment =   requestJson["recomment"];
         result.content =   requestJson["content"];
         result.images = requestJson["images"];
+        result.appearimages = requestJson["appearimages"];
+        result.detailimages = requestJson["detailimages"];
         result.delegates = requestJson["delegates"];
         result.config = requestJson["config"];
         result.praise = requestJson["praise"];
