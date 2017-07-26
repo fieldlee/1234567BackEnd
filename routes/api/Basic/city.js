@@ -54,6 +54,7 @@ router.get('/:province/:city', function(req, res) {
     var city = req.params.city;
 
     DistrictSchma.getDistrict(province,city,function (results) {
+        console.log(results);
         var jsonResult = {success: true, results: results};
         res.json(jsonResult);
     });

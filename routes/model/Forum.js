@@ -85,6 +85,11 @@ ForumSchma.statics.deleteForumById = function (id,callback) {
     this.remove({"_id":id}).then(callback);
 };
 
+
+ForumSchma.statics.searchForums = function (key,callback) {
+    this.find({ $or: [ {"title":{'$regex': key}}, {"content":{'$regex': key}} ]}).sort({"issueTime":-1}).then(callback);
+};
+
 ForumSchma.statics.getItemsByConditions = function (conditions,callback) {
     this.find(conditions).then(callback);
 };

@@ -70,6 +70,10 @@ ProductSchma.statics.getAll = function (cb) {
     this.find({}).then(cb);
 };
 
+ProductSchma.statics.searchProducts = function (key,callback) {
+    this.find({ $or: [ {"name":{'$regex': key}}, {"content":{'$regex': key}} ]}).sort({"issueTime":-1}).then(callback);
+};
+
 ProductSchma.statics.getItemsByConditions = function (conditions,cb) {
     this.find(conditions).then(cb);
 };
