@@ -14,9 +14,15 @@ var FroalaEditor = require('./lib/froalaEditor.js');
 
 
 
+
+
 router.post('/upload_image', function (req, res) {
+    console.log("upload image =====");
+    var ymPath = ymPathfun();
+    console.log(ymPath);
+    generateDir(ymPath);
     console.log("upload_image");
-    FroalaEditor.Image.upload(req, '/uploads/images/', function(err, data) {
+    FroalaEditor.Image.upload(req, '/uploads/images/'+ymPath+"/", function(err, data) {
 
         if (err) {
             return res.send(JSON.stringify(err));
@@ -27,10 +33,12 @@ router.post('/upload_image', function (req, res) {
 
 router.post('/upload_image_resize', function (req, res) {
     console.log("upload_image_resize");
+    var ymPath = ymPathfun();
+    generateDir(ymPath);
     var options = {
-        resize: [300, 300]
+        resize: [400, 400]
     };
-    FroalaEditor.Image.upload(req, '/uploads/images/', options, function(err, data) {
+    FroalaEditor.Image.upload(req, '/uploads/images/'+ymPath+"/", options, function(err, data) {
 
         if (err) {
             return res.send(JSON.stringify(err));
@@ -41,6 +49,8 @@ router.post('/upload_image_resize', function (req, res) {
 
 router.post('/upload_image_validation', function (req, res) {
     console.log("upload_image_validation");
+    var ymPath = ymPathfun();
+    generateDir(ymPath);
     var options = {
         fieldname: 'myImage',
         validation: function(filePath, mimetype, callback) {
@@ -63,7 +73,7 @@ router.post('/upload_image_validation', function (req, res) {
         }
     };
 
-    FroalaEditor.Image.upload(req, '/uploads/images/', options, function(err, data) {
+    FroalaEditor.Image.upload(req, '/uploads/images/'+ymPath+"/", options, function(err, data) {
 
         if (err) {
             return res.send(JSON.stringify(err));
@@ -74,11 +84,13 @@ router.post('/upload_image_validation', function (req, res) {
 
 router.post('/upload_file', function (req, res) {
     console.log("upload_file");
+    var ymPath = ymPathfun();
+    generateDir(ymPath);
     var options = {
         validation: null
     };
 
-    FroalaEditor.File.upload(req, '/uploads/files/', options, function(err, data) {
+    FroalaEditor.File.upload(req, '/uploads/files/'+ymPath+"/", options, function(err, data) {
 
         if (err) {
             return res.status(404).end(JSON.stringify(err));
@@ -89,6 +101,8 @@ router.post('/upload_file', function (req, res) {
 
 router.post('/upload_file_validation', function (req, res) {
     console.log("upload_file_validation");
+    var ymPath = ymPathfun();
+    generateDir(ymPath);
     var options = {
         fieldname: 'myFile',
         validation: function(filePath, mimetype, callback) {
@@ -109,7 +123,7 @@ router.post('/upload_file_validation', function (req, res) {
         }
     };
 
-    FroalaEditor.File.upload(req, '/uploads/files/', options, function(err, data) {
+    FroalaEditor.File.upload(req, '/uploads/files/'+ymPath+"/", options, function(err, data) {
 
         if (err) {
             return res.status(404).end(JSON.stringify(err));
@@ -165,19 +179,35 @@ router.get('/get_amazon', function (req, res) {
     res.send(configsObj);
 });
 
+
+function ymPathfun() {
+    var curDate = new Date();
+    var curYear = curDate.getFullYear();
+    var curMonth = curDate.getMonth()+1;
+    var ymPath = "";
+    if (curMonth>=10){
+        ymPath = curYear+""+curMonth;
+    }else{
+        ymPath = curYear+"0"+curMonth;
+    }
+    return ymPath;
+}
 // Create folder for uploading files.
-var imagesDir = path.join(path.dirname(path.dirname(require.main.filename)), 'public/uploads/images');
-var filesDir = path.join(path.dirname(path.dirname(require.main.filename)), 'public/uploads/files');
-var videosDir = path.join(path.dirname(path.dirname(require.main.filename)), 'public/uploads/videos');
-if (!fs.existsSync(filesDir)){
-    fs.mkdirSync(filesDir);
+function generateDir(ympath) {
+    var imagesDir = path.join(path.dirname(path.dirname(require.main.filename)), 'public/uploads/images/'+ympath);
+    var filesDir = path.join(path.dirname(path.dirname(require.main.filename)), 'public/uploads/files/'+ympath);
+    var videosDir = path.join(path.dirname(path.dirname(require.main.filename)), 'public/uploads/videos/'+ympath);
+    if (!fs.existsSync(filesDir)){
+        fs.mkdirSync(filesDir);
+    }
+    if (!fs.existsSync(imagesDir)){
+        fs.mkdirSync(imagesDir);
+    }
+    if (!fs.existsSync(videosDir)){
+        fs.mkdirSync(videosDir);
+    }
 }
-if (!fs.existsSync(imagesDir)){
-    fs.mkdirSync(imagesDir);
-}
-if (!fs.existsSync(videosDir)){
-    fs.mkdirSync(videosDir);
-}
+
 
 
 module.exports = router;

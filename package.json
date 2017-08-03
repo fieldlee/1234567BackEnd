@@ -14,6 +14,7 @@
     "crypto-js": "^3.1.9-1",
     "debug": "~2.6.3",
     "express": "~4.15.2",
+    "fluent-ffmpeg": "^2.1.2",
     "gm": "^1.23.0",
     "jade": "~1.11.0",
     "jsonwebtoken": "^7.4.1",
@@ -21,9 +22,12 @@
     "mongoose": "^4.11.1",
     "morgan": "~1.8.1",
     "multer": "^1.3.0",
+    "node-schedule": "^1.2.3",
     "node-uuid": "^1.4.8",
     "passport": "^0.3.2",
     "serve-favicon": "~2.4.2",
-    "sha1": "^1.1.1"
+    "sha1": "^1.1.1",
+    "video-screen": "0.0.1",
+    "video-thumb": "0.0.3"
   }
 }

@@ -24,9 +24,17 @@ router.get('/recent',function (req,res) {
         var handleResults = new Array();
         for(var i=0;i<results.length;i++){
             User.getUserByObj(results[i],function (userResult,obj) {
-                obj.avator = userResult.avator;
-                obj.avatorPath = userResult.avatorPath;
-                obj.fromTime = config.preTime(obj.issueTime);
+                if (userResult == null){
+                    obj.avator = "匿名用户";
+                    obj.avatorPath = "";
+                    obj.fromTime = config.preTime(obj.issueTime);
+                }else{
+                    obj.avator = userResult.avator;
+                    obj.avatorPath = userResult.avatorPath;
+                    obj.fromTime = config.preTime(obj.issueTime);
+                }
+
+
                 handleResults.push(obj);
                 if(results.length == handleResults.length){
                     var sortedResults = handleResults.sort(function (o,t) {
@@ -88,8 +96,6 @@ router.get('/byid/:id',function (req, res) {
     }
 });
 
-
-
 router.get('/byusername/:username', function(req, res) {
     var username = req.params.username;
     if(username){
@@ -117,6 +123,21 @@ router.get('/byusername/:username', function(req, res) {
                     }
                 })
             }
+        });
+    }else{
+        var jsonResult = {"success":false};
+        res.json(jsonResult);
+        return;
+    }
+});
+
+router.get('/byproductid/:id', function(req, res) {
+    var productid = req.params.id;
+    if(productid){
+        Forum.getByProduct(productid,function (results) {
+            var jsonResult = {"success":true,"results":results};
+            res.json(jsonResult);
+            return;
         });
     }else{
         var jsonResult = {"success":false};

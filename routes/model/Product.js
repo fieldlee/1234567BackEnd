@@ -33,6 +33,8 @@ var ProductSchma = new mongoose.Schema({
     delegates:Array, // 代理的琴行
     config: {}, // 产品的config 比较
     praise:Array, // 计算出来的口碑数组，每个口碑的数量
+    praisetitles:{type:Array,default:[]},
+    praisestars:{type:Array,default:[]},
     recommentPrice:String
 });
 

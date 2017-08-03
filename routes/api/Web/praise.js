@@ -12,13 +12,13 @@ var router = express.Router();
 var config = require('../config');
 var Praise = require('../../model/Praise');
 var User = require('../../model/User');
+var ConfigPraise = require('../../model/ConfigPraise');
 /* GET users listing. */
 // req.params.type
 router.get('/byproduct/:productid', function(req, res) {
 
     if (req.params.productid){
         Praise.getPraiseByProductId(req.params.productid,function (results) {
-
             for(var i =0 ; i<results.length;i++){
                 results[i].fromTime = config.preTime(results[i].issueTime);
             }
@@ -46,6 +46,25 @@ router.get('/:id', function(req, res) {
             res.json(jsonResult);
             return;
         });
+    }
+
+});
+
+
+router.get('/config/:type', function(req, res) {
+    console.log(req.params.type);
+    if(req.params.type){
+        ConfigPraise.getConfigByType(req.params.type,function (result) {
+            console.log(result);
+            var jsonResult = {"success":true,"data":result};
+            res.json(jsonResult);
+            return;
+        });
+    }
+    else{
+        var jsonResult = {"success":false};
+        res.json(jsonResult);
+        return;
     }
 
 });

@@ -13,8 +13,18 @@ var config = require('../config');
 var Forum = require('../../model/Forum');
 var User = require('../../model/User');
 var Comment = require('../../model/Comment');
+var ffmpeg = require('fluent-ffmpeg');
+var uuid = require('node-uuid');
 /* GET users listing. */
 // req.params.type
+
+
+
+// /usr/local/Cellar/ffmpeg
+// ffmpeg.setFfmpegPath("/usr/local/Cellar/ffmpeg");
+// /Users/depengli/1234567backend/instrumentBackend/routes/api/Web/676a711ad00f90d74a3c169f08b9034e0e22a27c.mp4
+
+
 
 router.use('/sub', require('./subForum/subForum'));
 
@@ -68,9 +78,16 @@ router.get('/:type/:page', function(req, res) {
             }
             for (var i = (page-1)*pageSize; i < len; i++) {
                 User.getUserByObj(results[i],function (userResult,obj) {
-                    obj.avator = userResult.avator;
-                    obj.avatorPath = userResult.avatorPath;
-                    obj.fromTime = config.preTime(obj.issueTime);
+                    if (userResult == null){
+                        obj.avator = "匿名用户";
+                        obj.avatorPath = "";
+                        obj.fromTime = config.preTime(obj.issueTime);
+                    }else{
+                        obj.avator = userResult.avator;
+                        obj.avatorPath = userResult.avatorPath;
+                        obj.fromTime = config.preTime(obj.issueTime);
+                    }
+
                         handleResults.push(obj);
                         if((len - (page-1)*pageSize) == handleResults.length){
                             var sortedResults = handleResults.sort(function (o,t) {
@@ -100,7 +117,7 @@ router.get('/:type/:subtype/:page', function(req, res) {
 
         Forum.getTypeAndSubType(req.params.type,req.params.subtype,function (results) {
             var handleResults = new Array();
-            console.log("results.length"+results.length);
+
             var len = 0 ;
             if (results.length>=page*pageSize){
                 len = page*pageSize;
@@ -115,9 +132,16 @@ router.get('/:type/:subtype/:page', function(req, res) {
             }
             for (var i = (page-1)*pageSize; i < len; i++) {
                 User.getUserByObj(results[i],function (userResult,obj) {
-                    obj.avator = userResult.avator;
-                    obj.avatorPath = userResult.avatorPath;
-                    obj.fromTime = config.preTime(obj.issueTime);
+                    if (userResult==null){
+                        obj.avator = "匿名用户";
+                        obj.avatorPath = "";
+                        obj.fromTime = config.preTime(obj.issueTime);
+                    }else{
+                        obj.avator = userResult.avator;
+                        obj.avatorPath = userResult.avatorPath;
+                        obj.fromTime = config.preTime(obj.issueTime);
+                    }
+
                         handleResults.push(obj);
                         if((len - (page-1)*pageSize) == handleResults.length) {
                             var sortedResults = handleResults.sort(function (o, t) {
@@ -168,6 +192,29 @@ router.post('/', function(req, res) {
             result.tags =   requestJson["tags"];
             result.videos =   requestJson["videos"];
             result.images =   requestJson["images"];
+            if (result.videos.length>0){
+                //Save thumbnail image
+                var filename = uuid.v4()+".png";
+                var fullfilename = config.thumbnailFullPath()+"/"+filename;
+                var images = new Array();
+                images.push(fullfilename);
+                result.images = images;
+                //get thumbnail image
+                ffmpeg(config.getPath(result.videos[0]))
+                    .on('filenames', function(filenames) {
+                        console.log('Will generate ' + filenames.join(', '))
+                    })
+                    .on('end', function() {
+                        console.log('Screenshots taken');
+                    })
+                    .screenshots({
+                        count: 1,
+                        timestamps: ['00:02.123'],
+                        filename: filename,
+                        folder: config.thumbnailPath(),
+                        size: '200x150'
+                    });
+            }
             result.add(function (err) {
                 var jsonResult = {"success":true,"data":result};
                 res.json(jsonResult);
@@ -190,6 +237,28 @@ router.post('/', function(req, res) {
         forum.comment = 0;
         forum.read = 0;
         forum.support = 0;
+        if (forum.videos.length>0){
+            var filename = uuid.v4()+".png";
+            var fullfilename = config.thumbnailFullPath()+"/"+filename;
+            var images = new Array();
+            images.push(fullfilename);
+            forum.images = images;
+
+            ffmpeg(config.getPath(forum.videos[0]))
+                .on('filenames', function(filenames) {
+                console.log('Will generate ' + filenames.join(', '))
+                })
+                .on('end', function() {
+                    console.log('Screenshots taken');
+                })
+                .screenshots({
+                    count: 1,
+                    timestamps: ['00:02.123'],
+                    filename: filename,
+                    folder: config.thumbnailPath(),
+                    size: '200x150'
+                });
+        }
         forum.add(function (err) {
             console.log(err);
             var jsonResult = {"success":true,"data":forum};

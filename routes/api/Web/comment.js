@@ -7,27 +7,39 @@ var config = require('../config');
 var Comment = require('../../model/Comment');
 var User = require('../../model/User');
 var Forum = require('../../model/Forum');
+var News = require('../../model/News');
 
 router.get('/:pid',function (req,res) {
    if (req.params.pid) {
        Comment.getCommentsByPId(req.params.pid,function (results) {
-
            var handleResults = new Array();
            for (var i = 0, len = results.length; i < len; i++) {
                User.getUserByObj(results[i],function (userResult,obj) {
-                   obj.avator = userResult.avator;
-                   obj.avatorPath = userResult.avatorPath;
-                   obj.fromTime = config.preTime(obj.issueTime);
-
+                   if(userResult==null){
+                       obj.avator = "匿名用户";
+                       obj.avatorPath = "";
+                       obj.fromTime = config.preTime(obj.issueTime);
+                   }else{
+                       obj.avator = userResult.avator;
+                       obj.avatorPath = userResult.avatorPath;
+                       obj.fromTime = config.preTime(obj.issueTime);
+                   }
                    Comment.getCommentsByPId(obj._id,function (commentResults) {
                        console.log(commentResults);
                        if(commentResults.length>0){
                            var commentuserResults = new Array();
                            for (var j = 0, jlen = commentResults.length; j < jlen; j++) {
                                User.getUserByObj(commentResults[j],function (userResult2,commentObj) {
-                                   commentObj.avator = userResult2.avator;
-                                   commentObj.avatorPath = userResult2.avatorPath;
-                                   commentObj.fromTime = config.preTime(commentObj.issueTime);
+                                   if(userResult2==null){
+                                       commentObj.avator = "匿名用户";
+                                       commentObj.avatorPath = "";
+                                       commentObj.fromTime = config.preTime(commentObj.issueTime);
+                                   }else{
+                                       commentObj.avator = userResult2.avator;
+                                       commentObj.avatorPath = userResult2.avatorPath;
+                                       commentObj.fromTime = config.preTime(commentObj.issueTime);
+                                   }
+
                                    commentuserResults.push(commentObj);
                                    if (commentResults.length == commentuserResults.length){
                                        obj.subComments = commentuserResults;
@@ -87,15 +99,6 @@ router.post('/', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    console.log(requestJson);
-    // parentId:String,
-    //     content:String,
-    //     author:String,
-    //     issueTime:Date,
-    //     fromTime:String,
-    //     avator:String,
-    //     avatorPath:String
-    console.log(requestJson["_id"]);
 
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         Comment.getCommentsById(requestJson["_id"],function (result) {
@@ -104,10 +107,31 @@ router.post('/', function(req, res) {
             result.author =   requestJson["author"];
             result.issueTime =   requestJson["issueTime"];
             Forum.getForumById(requestJson["parentId"],function (t) {
-                t.comment =  t.comment+1;
-                t.add(function (err) {
-                    console.log(err);
-                });
+                if (t != null){
+                    if(t.comment){
+                        t.comment =  t.comment+1;
+                    }else{
+                        t.comment =  1;
+                    }
+                    t.add(function (err) {
+                        console.log(err);
+                    });
+                }
+
+            });
+            News.getNewsById(requestJson["parentId"],function (t) {
+                if (t != null){
+                    if(t.comment){
+                        t.comment =  t.comment+1;
+                    }else{
+                        t.comment =  1;
+                    }
+
+                    t.add(function (err) {
+                        console.log(err);
+                    });
+                }
+
             });
             result.add(function (err) {
                 console.log(err);
@@ -124,10 +148,31 @@ router.post('/', function(req, res) {
         comment.author =   requestJson["author"];
         comment.issueTime =   requestJson["issueTime"];
         Forum.getForumById(requestJson["parentId"],function (t) {
-           t.comment =  t.comment+1;
-           t.add(function (err) {
-               console.log(err);
-           });
+            if (t != null){
+                if(t.comment){
+                    t.comment =  t.comment+1;
+                }else{
+                    t.comment =  1;
+                }
+                t.add(function (err) {
+                    console.log(err);
+                });
+            }
+
+        });
+        News.getNewsById(requestJson["parentId"],function (t) {
+            if (t != null){
+                if(t.comment){
+                    t.comment =  t.comment+1;
+                }else{
+                    t.comment =  1;
+                }
+
+                t.add(function (err) {
+                    console.log(err);
+                });
+            }
+
         });
         comment.add(function (err) {
             console.log(err);
@@ -163,4 +208,3 @@ router.post('/support',function (req,res) {
 });
 
 module.exports = router;
-

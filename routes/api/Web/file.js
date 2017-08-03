@@ -9,17 +9,36 @@ var app = express();
 var fs = require('fs');
 var path = require('path');
 var Image = require('../../model/Image');
-
-
 var rootPath = "/uploads/formupload/";
+function getPath() {
+    console.log("/uploads/formupload/"+ymPathfun()+"/");
+    return "/uploads/formupload/"+ymPathfun()+"/";
+}
+function ymPathfun() {
+    var curDate = new Date();
+    var curYear = curDate.getFullYear();
+    var curMonth = curDate.getMonth()+1;
+    var ymPath = "";
+    if (curMonth>=10){
+        ymPath = curYear+""+curMonth;
+    }else{
+        ymPath = curYear+"0"+curMonth;
+    }
+    return ymPath;
+}
+// Create folder for uploading files.
+function generateDir(){
+    var imagesDir = path.join(path.dirname(path.dirname(require.main.filename)), getPath());
+    if (!fs.existsSync(imagesDir)){
+        fs.mkdirSync(imagesDir);
+    }
+}
 /* GET users listing. */
-// req.params.type
+
 router.delete('/:imagepath',function (req,res) {
     var imagepath = req.params.imagepath;
-
     imagepath = rootPath + imagepath;
     var filepath = path.join(path.join(path.dirname(path.dirname(require.main.filename)),"public"), imagepath);
-
     fs.unlink(filepath, function (err) {
         if (err) {
             res.json({"success":false});
@@ -72,6 +91,7 @@ router.post('/delete',function (req,res) {
 });
 
 router.post('/',function(req,res){
+    //判断文件夹是否存在
 
     var fileName = "";
     var originName = "";
@@ -80,9 +100,7 @@ router.post('/',function(req,res){
             callback(null, './public'+rootPath);
         },
         filename: function (req, file, callback) {
-
             originName = file.originalname;
-
             var fileExtension = "";
             if (file.mimetype) {
                 if (file.mimetype == 'image/jpeg' ){
@@ -106,14 +124,12 @@ router.post('/',function(req,res){
                 if (file.mimetype == 'image/svg+xml' ){
                     fileExtension = ".svg"
                 }
-
             }
             fileName = uuid.v4()+fileExtension;
             callback(null, fileName);
         }
     });
     multer({ storage : storage}).single('userPhoto')(req,res,function (err) {
-
         if(err) {
             console.log(err);
             res.json({success:false})

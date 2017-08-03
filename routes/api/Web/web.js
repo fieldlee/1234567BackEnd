@@ -37,6 +37,7 @@ router.use('/action', require('./action'));
 router.use('/product', require('./product'));
 router.use('/follow', require('./follow'));
 router.use('/praise', require('./praise'));
+router.use('/collect', require('./collect'));
 router.use('/search', require('./search'));
 //exports
 module.exports = router;

@@ -29,8 +29,8 @@ ConfigPraiseSchma.methods.add = function (callback) {
     this.save().then(callback);
 };
 
-ConfigPraiseSchma.statics.getConfigByType = function (type,subtype,callback) {
-    this.find({"type":type}).then(callback);
+ConfigPraiseSchma.statics.getConfigByType = function (type,callback) {
+    this.findOne({"type":type}).then(callback);
 };
 
 ConfigPraiseSchma.statics.getConfigInfoById = function (id,callback) {

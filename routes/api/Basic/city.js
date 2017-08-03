@@ -43,7 +43,7 @@ router.get('/', function(req, res) {
 router.get('/:province', function(req, res) {
     var province = req.params.province;
     CitySchma.getCity(province,function (results) {
-        console.log(results);
+
         var jsonResult = {success: true, results: results};
         res.json(jsonResult);
     });
@@ -54,7 +54,7 @@ router.get('/:province/:city', function(req, res) {
     var city = req.params.city;
 
     DistrictSchma.getDistrict(province,city,function (results) {
-        console.log(results);
+
         var jsonResult = {success: true, results: results};
         res.json(jsonResult);
     });
@@ -125,15 +125,15 @@ router.post('/:province/:city', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    console.log(requestJson);
+
     if (requestJson["districts"] instanceof Array) {
         var districts = requestJson["districts"];
         DistrictSchma.deleteDistrict(province,city,function (result) {
             console.log(result.result);
         });
-        console.log(districts.length);
+
         for (d in districts){
-            console.log(districts[d]);
+
             if (districts[d] != null && districts[d] != "") {
                 var DistrictObj = new DistrictSchma();
                 DistrictObj.id = uuid.v4();

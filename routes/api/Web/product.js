@@ -20,7 +20,7 @@ router.get('/', function(req, res) {
 });
 
 router.get('/:id', function(req, res) {
-    Product.getProductById(req.param("id"),function (result) {
+    Product.getProductById(req.params.id,function (result) {
         var jsonResult = {"success":true,"data":result};
         res.json(jsonResult);
         return;

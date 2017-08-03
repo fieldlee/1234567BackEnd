@@ -96,5 +96,31 @@ module.exports = {
         //     return day + "天前";
         // else
         //     return date.yyyymmdd();
+    },
+    getRootPath:function () {
+      return "http://localhost:3000";
+    },
+    getPath:function (path) {
+        var replacePath = path.replace(this.getRootPath(),"./public");
+        return replacePath;
+    },
+    getYmPath:function () {
+        var curDate = new Date();
+        var curYear = curDate.getFullYear();
+        var curMonth = curDate.getMonth()+1;
+        var ymPath = "";
+        if (curMonth>=10){
+            ymPath = curYear+""+curMonth;
+        }else{
+            ymPath = curYear+"0"+curMonth;
+        }
+        return ymPath;
+    },
+    thumbnailFullPath:function () {
+        return this.getRootPath()+"/uploads/files/"+this.getYmPath();
+    },
+    thumbnailPath:function () {
+
+        return "./public/uploads/files/"+this.getYmPath();
     }
 };

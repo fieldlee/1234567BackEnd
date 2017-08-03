@@ -18,9 +18,11 @@ var DelegateSchma = new mongoose.Schema({
     name:String,
     address:String,
     email:String,
-    provice:String,
+    telephone:String,
+    province:String,
     city:String,
-    id:String
+    district:String,
+    images:{type:Array,default:[]}
 });
 
 DelegateSchma.methods.add = function (callback) {
@@ -28,7 +30,7 @@ DelegateSchma.methods.add = function (callback) {
 };
 
 DelegateSchma.statics.getDelegateById = function (id,callback) {
-    this.findOne({"id":id}).then(callback);
+    this.findOne({"_id":id}).then(callback);
 };
 
 DelegateSchma.statics.getAll = function (callback) {
@@ -38,6 +40,5 @@ DelegateSchma.statics.getAll = function (callback) {
 DelegateSchma.statics.getItemsByConditions = function (conditions,callback) {
     this.find(conditions).then(callback);
 };
-
 
 module.exports = db.model('delegate', DelegateSchma);

@@ -26,7 +26,8 @@ var ForumSchma = new mongoose.Schema({
     videos:Array,
     comment:Number,
     read:Number,
-    support:Number
+    support:Number,
+    collect:{type:Number,default:0}
 });
 
 ForumSchma.methods.add = function (callback) {
@@ -75,6 +76,10 @@ ForumSchma.statics.getAll = function (callback) {
 
 ForumSchma.statics.getByUsername = function (username,callback) {
     this.find({"author":username}).sort({"issueTime":-1}).then(callback);
+};
+
+ForumSchma.statics.getByProduct = function (id,callback) {
+    this.find({"product":id}).sort({"issueTime":-1}).then(callback);
 };
 
 ForumSchma.statics.getForumById = function (id,callback) {
