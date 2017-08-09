@@ -104,6 +104,10 @@ module.exports = {
         var replacePath = path.replace(this.getRootPath(),"./public");
         return replacePath;
     },
+    getUrlPath :function (path) {
+        var replacePath = path.replace("./public",this.getRootPath());
+        return replacePath;
+    },
     getYmPath:function () {
         var curDate = new Date();
         var curYear = curDate.getFullYear();
@@ -120,7 +124,16 @@ module.exports = {
         return this.getRootPath()+"/uploads/files/"+this.getYmPath();
     },
     thumbnailPath:function () {
-
         return "./public/uploads/files/"+this.getYmPath();
+    },
+    getImagePath:function () {
+        return "./public/uploads/images/"+this.getYmPath();
+    },
+    getImageUrls:function(content){
+        var m,urls = [],rex =/<img[^>]+src="(http:\/\/[^">]+)"/g;
+        while ( m = rex.exec( content ) ) {
+            urls.push( m[1] );
+        }
+        return urls;
     }
 };

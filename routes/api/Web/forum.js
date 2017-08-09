@@ -87,7 +87,7 @@ router.get('/:type/:page', function(req, res) {
                         obj.avatorPath = userResult.avatorPath;
                         obj.fromTime = config.preTime(obj.issueTime);
                     }
-
+                    config.getImageUrls(obj.content);
                         handleResults.push(obj);
                         if((len - (page-1)*pageSize) == handleResults.length){
                             var sortedResults = handleResults.sort(function (o,t) {
@@ -110,7 +110,7 @@ router.get('/:type/:page', function(req, res) {
 });
 
 router.get('/:type/:subtype/:page', function(req, res) {
-    console.log(req.params.page);
+    // console.log(req.params.page);
     var pageSize = 10;
     var page = new Number(req.params.page);
     if (req.params.type && req.params.subtype) {
@@ -169,7 +169,7 @@ router.post('/', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    console.log(requestJson);
+    // console.log(requestJson);
     // title: String,
     //     type: String,
     //     content:String,
@@ -177,7 +177,7 @@ router.post('/', function(req, res) {
     //     avator:String,
     //     issueTime:Date,
     //     images:Array
-    console.log(requestJson["_id"]);
+    // console.log(requestJson["_id"]);
 
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         Forum.getForumById(requestJson["_id"],function (result) {

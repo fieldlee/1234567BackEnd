@@ -16,7 +16,7 @@ var ConfigPraise = require('../../model/ConfigPraise');
 // req.params.type
 router.get('/', function(req, res) {
     ConfigPraise.getAll(function (results) {
-        console.log(results);
+        // console.log(results);
         var jsonResult = {"success":true,"results":results};
         res.json(jsonResult);
     });

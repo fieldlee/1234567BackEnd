@@ -32,13 +32,13 @@ router.get('/:key', function(req, res) {
 
 router.post('/', function(req, res) {
     var body = req.body;
-    console.log("*****");
-    console.log(body);
+    // console.log("*****");
+    // console.log(body);
     var requestJson = body;
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    console.log(requestJson);
+    // console.log(requestJson);
     if (config.isMail(requestJson["username"])){
         requestJson["email"] = requestJson["username"];
     }else{

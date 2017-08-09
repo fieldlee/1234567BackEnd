@@ -12,6 +12,7 @@ var router = express.Router();
 var config = require('../config');
 var Praise = require('../../model/Praise');
 var User = require('../../model/User');
+var Product = require('../../model/Product');
 var ConfigPraise = require('../../model/ConfigPraise');
 /* GET users listing. */
 // req.params.type
@@ -39,7 +40,6 @@ router.get('/byproduct/:productid', function(req, res) {
 });
 
 router.get('/:id', function(req, res) {
-
     if (req.params.id){
         Praise.getPraiseById(req.params.id,function (result) {
             var jsonResult = {"success":true,"data":result};
@@ -55,7 +55,7 @@ router.get('/config/:type', function(req, res) {
     console.log(req.params.type);
     if(req.params.type){
         ConfigPraise.getConfigByType(req.params.type,function (result) {
-            console.log(result);
+            // console.log(result);
             var jsonResult = {"success":true,"data":result};
             res.json(jsonResult);
             return;
@@ -106,6 +106,25 @@ router.post('/', function(req, res) {
             result.praisetitles = requestJson["praisetitles"];
             result.praisevalues = requestJson["praisevalues"];
             result.praisestars = requestJson["praisestars"];
+            // //查找产品信息，往产品信息里写值
+            // Product.getProductById(result.product,function (product) {
+            //     if (product.praisenum){
+            //         product.praisenum = parseInt(product.praisenum) + 1;
+            //     }else{
+            //         product.praisenum = 1;
+            //     }
+            //     // 计算titles
+            //     if (product.praisetitles){
+            //         for(var i=0;i<product.praisetitles.length;i++){
+            //             product.praisestars[i] = parseInt(product.praisestars[i])+parseInt(result.praisestars[i]);
+            //         }
+            //     }else{
+            //         product.praisetitles = result.praisetitles;
+            //         product.praisestars = result.praisestars;
+            //     }
+            //     product.add(); // 产品信息保存
+            // });
+
             result.add(function (err) {
                 var jsonResult = {"success":true,"data":result};
                 res.json(jsonResult);
@@ -130,9 +149,10 @@ router.post('/', function(req, res) {
         result.praisevalues = requestJson["praisevalues"];
         result.praisestars = requestJson["praisestars"];
         result.issueTime = new Date();
+
         result.add(function (err) {
             var jsonResult = {"success":true,"data":result};
-            console.log(jsonResult);
+            // console.log(jsonResult);
             res.json(jsonResult);
             return;
         });

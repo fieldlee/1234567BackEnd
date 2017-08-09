@@ -12,7 +12,17 @@ var News = require('../../model/News');
 
 /* GET users listing. */
 // req.params.type
-
+router.get('/number',function (req,res) {
+    News.getAll(function (results) {
+        console.log(results);
+       if (results.length>0){
+           var jsonResult = {success:true,"count":results.length};
+           console.log(jsonResult);
+           res.json(jsonResult);
+           return;
+       }
+    });
+});
 router.get('/byid/:id',function (req,res) {
     var id = req.params.id;
     News.getNewsById(id,function (result) {
@@ -44,7 +54,7 @@ router.get('/:page', function(req, res) {
 
     News.getAll(function (results) {
         var handleResults = new Array();
-        console.log("results.length"+results.length);
+
         var len = 0 ;
         if (results.length >= page*pageSize){
             len = page*pageSize;
@@ -59,7 +69,7 @@ router.get('/:page', function(req, res) {
 
         for (var i = (page-1)*pageSize; i < len; i++) {
             User.getUserByObj(results[i],function (userResult,obj) {
-                console.log(userResult.avator);
+
                 if(userResult != null){
                     if(userResult.avator != null){
                         obj.avator = userResult.avator;
@@ -82,7 +92,7 @@ router.get('/:page', function(req, res) {
                         }
                     });
                     var jsonResult = {success: true, page:page, results: sortedResults, count: sortedResults.length};
-                    console.log(jsonResult);
+
                     res.json(jsonResult);
 
                     return;
@@ -98,15 +108,6 @@ router.post('/', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    console.log(requestJson);
-    // title: String,
-    //     type: String,
-    //     content:String,
-    //     author:String,
-    //     issueTime:Date,
-    //     avator:String,
-    //     images:Array
-    console.log(requestJson["_id"]);
 
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         News.getNewsById(requestJson["_id"],function (result) {
@@ -124,7 +125,7 @@ router.post('/', function(req, res) {
             });
         });
     }else{
-        console.log(requestJson["startTime"]);
+
         var news = new News();
         news.title =   requestJson["title"];
         news.content =   requestJson["content"];

@@ -26,6 +26,7 @@ var PraiseSchma = new mongoose.Schema({
     content:String,
     best:String,
     bad:String,
+    praisenum:{type:Number,default:0},
     praisetitles:Array,
     praisevalues:Array,
     praisestars:Array,

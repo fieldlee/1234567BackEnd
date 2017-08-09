@@ -41,4 +41,8 @@ DelegateSchma.statics.getItemsByConditions = function (conditions,callback) {
     this.find(conditions).then(callback);
 };
 
+DelegateSchma.statics.deleteAdsById = function (id,callback) {
+    this.remove({"_id":id}).then(callback);
+};
+
 module.exports = db.model('delegate', DelegateSchma);

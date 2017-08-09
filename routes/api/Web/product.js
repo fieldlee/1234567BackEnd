@@ -13,7 +13,7 @@ var Product = require('../../model/Product');
 // req.params.type
 router.get('/', function(req, res) {
     Product.getAll(function (results) {
-        console.log(results);
+        // console.log(results);
         var jsonResult = {"success":true,"results":results};
         res.json(jsonResult);
     });
@@ -21,9 +21,16 @@ router.get('/', function(req, res) {
 
 router.get('/:id', function(req, res) {
     Product.getProductById(req.params.id,function (result) {
-        var jsonResult = {"success":true,"data":result};
-        res.json(jsonResult);
-        return;
+        if(result){
+            var jsonResult = {"success":true,"data":result};
+            res.json(jsonResult);
+            return;
+        }
+        else{
+            var jsonResult = {"success":false};
+            res.json(jsonResult);
+            return;
+        }
     });
 });
 

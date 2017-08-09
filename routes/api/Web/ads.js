@@ -22,18 +22,10 @@ router.post('/', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    console.log(requestJson);
-    // title: String,
-    //     type: String,
-    //     value:String,
-    //     path:String,
-    //     startTime:Date,
-    //     endTime:Date
-    console.log(requestJson["_id"]);
-
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         AdsSchema.getAdsById(requestJson["_id"],function (result) {
             result.title =   requestJson["title"];
+            result.subtitle =   requestJson["subtitle"];
             result.value =   requestJson["value"];
             result.type =   requestJson["type"];
             result.path =   requestJson["path"];
@@ -50,6 +42,7 @@ router.post('/', function(req, res) {
         console.log(requestJson["startTime"]);
         var ads = new AdsSchema();
         ads.title =   requestJson["title"];
+        ads.subtitle =   requestJson["subtitle"];
         ads.value =   requestJson["value"];
         ads.type =   requestJson["type"];
         ads.path =   requestJson["path"];

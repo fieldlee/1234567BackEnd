@@ -24,6 +24,7 @@ var UserSchma = new mongoose.Schema({
     phone:String,
     email:String,
     registerTime:Date,
+    role:{type:String,default:""},
     avator:String,
     avatorPath:String,
     backgroundPath:String,
@@ -52,12 +53,12 @@ UserSchma.statics.getUserByUserName = function (id,cb) {
 };
 
 UserSchma.statics.getUserByObj = function (obj,cb) {
-    console.log(obj);
+
     if(obj.author == null){
         cb(null,obj);
     }else{
         this.findOne({"username":obj.author}).then(function (result) {
-            console.log(result);
+            // console.log(result);
             cb(result,obj);
         });
     }

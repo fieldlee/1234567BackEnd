@@ -30,7 +30,7 @@ router.get('/', function(req, res) {
                             myFollows.push(userResult);
                             if(results.length == myFollows.length){
                                 Follow.getFollowForMy(username,function (results2) {
-                                    console.log(results2);
+
                                     if(results2 && results2.length>0){
                                         for(var o in results2){
                                             if (results2[o].username){
@@ -48,7 +48,7 @@ router.get('/', function(req, res) {
                                     }
                                     else{
                                         var respJson = {"success":true,"myfollows":myFollows,"followmys":followmines};
-                                        console.log(respJson);
+
                                         res.json(respJson);
                                         return;
                                     }
@@ -65,7 +65,7 @@ router.get('/', function(req, res) {
                                 followmines.push(userResult2);
                                 if(results2.length == followmines.length){
                                     var respJson = {"success":true,"myfollows":myFollows,"followmys":followmines};
-                                    console.log(respJson);
+
                                     res.json(respJson);
                                     return;
                                 }
@@ -77,6 +77,27 @@ router.get('/', function(req, res) {
         });
     }
     
+});
+
+router.post('/byuser',function (req,res) {
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+    if(requestJson["username"] && requestJson["followusername"]){
+        Follow.getFollow(requestJson["username"],requestJson["followusername"],function (results) {
+            if(results.length > 0 ){
+                var respJson = {"success":false,"message":"已经关注过了"};
+                res.json(respJson);
+                return;
+            }else{
+                var respJson = {"success":true,"message":"可以关注该用户"};
+                res.json(respJson);
+                return;
+            }
+        });
+    }
 });
 
 router.post('/', function(req, res) {

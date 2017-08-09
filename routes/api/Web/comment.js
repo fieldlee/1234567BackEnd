@@ -14,6 +14,7 @@ router.get('/:pid',function (req,res) {
        Comment.getCommentsByPId(req.params.pid,function (results) {
            var handleResults = new Array();
            for (var i = 0, len = results.length; i < len; i++) {
+               console.log(results[i].issueTime);
                User.getUserByObj(results[i],function (userResult,obj) {
                    if(userResult==null){
                        obj.avator = "匿名用户";
@@ -25,7 +26,6 @@ router.get('/:pid',function (req,res) {
                        obj.fromTime = config.preTime(obj.issueTime);
                    }
                    Comment.getCommentsByPId(obj._id,function (commentResults) {
-                       console.log(commentResults);
                        if(commentResults.length>0){
                            var commentuserResults = new Array();
                            for (var j = 0, jlen = commentResults.length; j < jlen; j++) {
@@ -92,6 +92,108 @@ router.get('/:pid',function (req,res) {
        });
    }
 });
+
+router.get('/:pid/:page',function (req,res) {
+    var pagesize = 10;
+    var pagenumber = 1;
+    if (req.params.page){
+        pagenumber = parseInt(req.params.page);
+    }
+
+    if (req.params.pid) {
+        Comment.getCommentsByPId(req.params.pid,function (results) {
+
+            var handleResults = new Array();
+            var endLen = 0;
+            var startLen = (pagenumber-1)*pagesize;
+            if (results.length <= pagesize*pagenumber){
+                endLen =  results.length;
+            }else{
+                endLen = pagesize*pagenumber;
+            }
+
+            for (var i = startLen; i < endLen; i++) {
+
+                User.getUserByObj(results[i],function (userResult,obj) {
+                    if(userResult==null){
+                        obj.avator = "匿名用户";
+                        obj.avatorPath = "";
+                        obj.fromTime = config.preTime(obj.issueTime);
+                    }else{
+                        obj.avator = userResult.avator;
+                        obj.avatorPath = userResult.avatorPath;
+                        obj.fromTime = config.preTime(obj.issueTime);
+                    }
+                    Comment.getCommentsByPId(obj._id,function (commentResults) {
+                        if(commentResults.length>0){
+                            var commentuserResults = new Array();
+                            for (var j = 0, jlen = commentResults.length; j < jlen; j++) {
+                                User.getUserByObj(commentResults[j],function (userResult2,commentObj) {
+                                    if(userResult2==null){
+                                        commentObj.avator = "匿名用户";
+                                        commentObj.avatorPath = "";
+                                        commentObj.fromTime = config.preTime(commentObj.issueTime);
+                                    }else{
+                                        commentObj.avator = userResult2.avator;
+                                        commentObj.avatorPath = userResult2.avatorPath;
+                                        commentObj.fromTime = config.preTime(commentObj.issueTime);
+                                    }
+
+                                    commentuserResults.push(commentObj);
+                                    if (commentResults.length == commentuserResults.length){
+                                        obj.subComments = commentuserResults;
+
+                                        handleResults.push(obj);
+
+                                        if((endLen-startLen) == handleResults.length){
+                                            var sortedResults = handleResults.sort(function (o,t) {
+                                                var oT = new Date(o.issueTime);
+                                                var tT = new Date(t.issueTime);
+                                                if (oT > tT){
+                                                    return -1;
+                                                }else{
+                                                    return 1;
+                                                }
+                                            });
+
+                                            var jsonResult = {success:true,results:sortedResults,count:results.length};
+                                            res.json(jsonResult);
+                                            return;
+                                        }
+                                    }
+                                });
+
+                            }
+                        }else{ ////
+                            obj.subComments = [];
+
+                            handleResults.push(obj);
+
+                            if((endLen-startLen) == handleResults.length){
+                                var sortedResults = handleResults.sort(function (o,t) {
+                                    var oT = new Date(o.issueTime);
+                                    var tT = new Date(t.issueTime);
+                                    if (oT > tT){
+                                        return -1;
+                                    }else{
+                                        return 1;
+                                    }
+                                });
+
+                                var jsonResult = {success:true,results:sortedResults,count:results.length};
+                                res.json(jsonResult);
+                                return;
+                            }
+                        }
+
+                    });
+                });
+            }
+
+        });
+    }
+});
+
 
 router.post('/', function(req, res) {
     var body = req.body;
@@ -189,7 +291,7 @@ router.post('/support',function (req,res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    console.log(requestJson);
+
     if (requestJson["id"] != null && requestJson["id"] != "" && requestJson["id"] != undefined){
         Comment.getCommentsById(requestJson["id"],function (result) {
             if (result.support){

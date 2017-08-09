@@ -20,6 +20,7 @@ router.use('/upload', require('./upload'));
 router.use('/forum', require('./forum'));
 router.use('/brand', require('./brand'));
 router.use('/comment', require('./comment'));
+router.use('/streams', require('./stream'));
 // router.use(function(req, res, next) {
 //     console.log(config.verifyToken(req));
 //     if (config.verifyToken(req)){

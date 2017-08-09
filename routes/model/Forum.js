@@ -99,4 +99,12 @@ ForumSchma.statics.getItemsByConditions = function (conditions,callback) {
     this.find(conditions).then(callback);
 };
 
+
+// For handle image url
+
+ForumSchma.statics.getNeedDownload = function (callback) {
+    this.find({ images : { $size : 0 },content:{'$regex': "<img"}}).then(callback);
+};
+
+
 module.exports = db.model('forum', ForumSchma);

@@ -4,6 +4,7 @@ var router = express.Router();
 var config = require('../config');
 var Collect = require('../../model/Collect');
 var Forum =   require('../../model/Forum');
+var News =   require('../../model/News');
 
 router.get('/:username',function (req,res) {
     if (req.params.username) {
@@ -26,65 +27,132 @@ router.post('/', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
-        Collect.getCollectById(requestJson["_id"],function (result) {
-            Forum.getForumById(requestJson["forumId"],function (forum) {
-                if (forum.collect){
-                    forum.collect = 1;
-                }else {
-                    forum.collect = forum.collect + 1;
-                }
-                forum.add();
-            });
-            result.avator = requestJson["avator"];
-            result.avatorPath = requestJson["avatorPath"];
-            result.username = requestJson["username"];
-            result.forumId = requestJson["forumId"];
-            result.author =  requestJson["author"];
-            result.title =  requestJson["title"];
-            result.add(function (err) {
-                var jsonResult = {"success":true,"data":result};
-                res.json(jsonResult);
-                return;
-            });
-        });
-    }
-    else{
-
-        Collect.getCollectByIdUsername(requestJson["forumId"],requestJson["username"],function (result) {
-            if (result == null){
-                // 增加collect number
-                Forum.getForumById(requestJson["forumId"],function (result) {
-                    if (result.collect){
-                        result.collect = 1;
+    if(requestJson["newsId"] != null && requestJson["newsId"] != "" && requestJson["newsId"] != undefined){
+        if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
+            Collect.getCollectById(requestJson["_id"],function (result) {
+                News.getNewsById(requestJson["newsId"],function (forum) {
+                    if (forum.collect){
+                        forum.collect = 1;
                     }else {
-                        result.collect = result.collect + 1;
+                        forum.collect = forum.collect + 1;
                     }
-                    result.add();
+                    forum.add();
                 });
-
-                var collect = new Collect();
-                collect.avator = requestJson["avator"];
-                collect.avatorPath = requestJson["avatorPath"];
-                collect.username = requestJson["username"];
-                collect.forumId = requestJson["forumId"];
-                collect.author =  requestJson["author"];
-                collect.title =  requestJson["title"];
-                collect.add(function (err) {
-                    var jsonResult = {"success":true,"data":collect};
+                result.avator = requestJson["avator"];
+                result.avatorPath = requestJson["avatorPath"];
+                result.username = requestJson["username"];
+                result.forumId = requestJson["newsId"];
+                result.type = "news";
+                result.author =  requestJson["author"];
+                result.title =  requestJson["title"];
+                result.add(function (err) {
+                    var jsonResult = {"success":true,"data":result};
                     res.json(jsonResult);
                     return;
                 });
-            }else{
-                var jsonResult = {"success":false,"message":"您已经收藏了此帖子"};
-                res.json(jsonResult);
-                return;
-            }
+            });
+        }
+        else{
 
-        });
+            Collect.getCollectByIdUsername(requestJson["newsId"],requestJson["username"],function (result) {
+                if (result == null){
+                    // 增加collect number
+                    News.getNewsById(requestJson["newsId"],function (result) {
+                        if (result.collect){
+                            result.collect = 1;
+                        }else {
+                            result.collect = result.collect + 1;
+                        }
+                        result.add();
+                    });
+
+                    var collect = new Collect();
+                    collect.avator = requestJson["avator"];
+                    collect.avatorPath = requestJson["avatorPath"];
+                    collect.username = requestJson["username"];
+                    collect.forumId = requestJson["newsId"];
+                    collect.type = "news";
+                    collect.author =  requestJson["author"];
+                    collect.title =  requestJson["title"];
+                    collect.add(function (err) {
+                        var jsonResult = {"success":true,"data":collect};
+                        res.json(jsonResult);
+                        return;
+                    });
+                }else{
+                    var jsonResult = {"success":false,"message":"您已经收藏了此帖子"};
+                    res.json(jsonResult);
+                    return;
+                }
+
+            });
 
 
+        }
+
+    }else
+    {
+        if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
+            Collect.getCollectById(requestJson["_id"],function (result) {
+                Forum.getForumById(requestJson["forumId"],function (forum) {
+                    if (forum.collect){
+                        forum.collect = 1;
+                    }else {
+                        forum.collect = forum.collect + 1;
+                    }
+                    forum.add();
+                });
+                result.avator = requestJson["avator"];
+                result.avatorPath = requestJson["avatorPath"];
+                result.username = requestJson["username"];
+                result.forumId = requestJson["forumId"];
+                result.type = "forum";
+                result.author =  requestJson["author"];
+                result.title =  requestJson["title"];
+                result.add(function (err) {
+                    var jsonResult = {"success":true,"data":result};
+                    res.json(jsonResult);
+                    return;
+                });
+            });
+        }
+        else{
+
+            Collect.getCollectByIdUsername(requestJson["forumId"],requestJson["username"],function (result) {
+                if (result == null){
+                    // 增加collect number
+                    Forum.getForumById(requestJson["forumId"],function (result) {
+                        if (result.collect){
+                            result.collect = 1;
+                        }else {
+                            result.collect = result.collect + 1;
+                        }
+                        result.add();
+                    });
+
+                    var collect = new Collect();
+                    collect.avator = requestJson["avator"];
+                    collect.avatorPath = requestJson["avatorPath"];
+                    collect.username = requestJson["username"];
+                    collect.forumId = requestJson["forumId"];
+                    collect.type = "forum";
+                    collect.author =  requestJson["author"];
+                    collect.title =  requestJson["title"];
+                    collect.add(function (err) {
+                        var jsonResult = {"success":true,"data":collect};
+                        res.json(jsonResult);
+                        return;
+                    });
+                }else{
+                    var jsonResult = {"success":false,"message":"您已经收藏了此帖子"};
+                    res.json(jsonResult);
+                    return;
+                }
+
+            });
+        }
     }
+
 });
 
 module.exports = router;

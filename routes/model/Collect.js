@@ -20,6 +20,7 @@ var CollectSchma = new mongoose.Schema({
     avatorPath:String,
     author:String,
     title:String,
+    type:{type:String,default:"forum"},
     fromTime:String,
     collectTime:{type:Date,default:new Date()},
     forumId:String

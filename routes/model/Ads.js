@@ -13,6 +13,7 @@ var db = mongoose.createConnection(config.getDatabase());
 
 var AdsSchma = new mongoose.Schema({
     title: String,
+    subtitle: String,
     type: String,
     value:String,
     path:String,

@@ -31,7 +31,8 @@ var NewsSchma = new mongoose.Schema({
     videos:Array,
     comment:{ type: Number, default: 0 },
     read:{ type: Number, default: 0 },
-    support:{ type: Number, default: 0 }
+    support:{ type: Number, default: 0 },
+    collect:{type:Number,default:0}
 });
 
 NewsSchma.methods.add = function (cb) {

@@ -18,6 +18,7 @@ apiRouter.use(function (req,res,next) {
 
 apiRouter.use('/city', require('./city'));
 apiRouter.use('/type', require('./type'));
+apiRouter.use('/delegate', require('./delegate'));
 apiRouter.use('/configpraise', require('./configpraise'));
 //exports
 module.exports = apiRouter;
