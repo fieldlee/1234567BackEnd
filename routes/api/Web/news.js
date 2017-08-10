@@ -14,7 +14,6 @@ var News = require('../../model/News');
 // req.params.type
 router.get('/number',function (req,res) {
     News.getAll(function (results) {
-        console.log(results);
        if (results.length>0){
            var jsonResult = {success:true,"count":results.length};
            console.log(jsonResult);
@@ -54,7 +53,6 @@ router.get('/:page', function(req, res) {
 
     News.getAll(function (results) {
         var handleResults = new Array();
-
         var len = 0 ;
         if (results.length >= page*pageSize){
             len = page*pageSize;

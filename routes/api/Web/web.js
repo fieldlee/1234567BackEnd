@@ -40,5 +40,6 @@ router.use('/follow', require('./follow'));
 router.use('/praise', require('./praise'));
 router.use('/collect', require('./collect'));
 router.use('/search', require('./search'));
+router.use('/class', require('./class'));
 //exports
 module.exports = router;
