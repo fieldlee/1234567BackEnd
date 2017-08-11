@@ -12,6 +12,27 @@ router.get('/', function(req, res) {
     });
 });
 
+router.get('/:id', function(req, res) {
+    Class.getClassByID(req.params.id,function (result) {
+        var jsonResult = {"success":true,"data":result};
+        res.json(jsonResult);
+    });
+
+});
+
+router.post('/join',function(req, res){
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+    if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
+        Class.getClassByID(requestJson["_id"],function (result) {
+
+        });
+    }
+});
+
 router.post('/', function(req, res) {
     var body = req.body;
     var requestJson = body;
@@ -34,36 +55,46 @@ router.post('/', function(req, res) {
             result.subtitle =   requestJson["subtitle"];
             result.price =   requestJson["price"];
             result.start =   requestJson["start"];
+            result.record =   requestJson["record"];
+            result.author =   requestJson["author"];
             result.end =   requestJson["end"];
             result.telphone =   requestJson["telphone"];
-            result.lecture =   requestJson["lecture"];
+            result.lecture =   requestJson["lecture"];//lecturename
+            result.lecturename =   requestJson["lecturename"];
             result.status =   requestJson["status"];
             result.images =   requestJson["images"];
+            result.content =   requestJson["content"];
             result.schedules =   requestJson["schedules"];
             result.add(function (err) {
                 console.log(err);
                 var jsonResult = {"success": true,"data":result};
                 res.json(jsonResult);
+                return;
             });
             // ads = result;
         });
     }else{
 
-        var ads = new Class();
-        ads.title =   requestJson["title"];
-        ads.subtitle =   requestJson["subtitle"];
-        ads.price =   requestJson["price"];
-        ads.start =   requestJson["start"];
-        ads.end =   requestJson["end"];
-        ads.telphone =   requestJson["telphone"];
-        ads.lecture =   requestJson["lecture"];
-        ads.status =   requestJson["status"];
-        ads.images =   requestJson["images"];
-        ads.schedules =   requestJson["schedules"];
-        ads.add(function (err) {
+        var classinfo = new Class();
+        classinfo.title =   requestJson["title"];
+        classinfo.subtitle =   requestJson["subtitle"];
+        classinfo.price =   requestJson["price"];
+        classinfo.start =   requestJson["start"];
+        classinfo.end =   requestJson["end"];
+        classinfo.record =   requestJson["record"];
+        classinfo.telphone =   requestJson["telphone"];
+        classinfo.lecture =   requestJson["lecture"];
+        classinfo.lecturename =   requestJson["lecturename"];
+        classinfo.status =   requestJson["status"];
+        classinfo.author =   requestJson["author"];
+        classinfo.content =   requestJson["content"];
+        classinfo.images =   requestJson["images"];
+        classinfo.schedules =   requestJson["schedules"];
+        classinfo.add(function (err) {
             console.log(err);
-            var jsonResult = {"success": true,"data":ads};
+            var jsonResult = {"success": true,"data":classinfo};
             res.json(jsonResult);
+            return;
         })
     }
 
@@ -87,7 +118,6 @@ router.post('/delete', function(req, res) {
             }
         });
     }
-
 });
 
 

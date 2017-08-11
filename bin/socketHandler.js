@@ -1,5 +1,6 @@
 module.exports = function(io, streams) {
     io.on('connection', function(client) {
+        console.log(client);
         console.log('-- ' + client.id + ' joined --');
         client.emit('id', client.id);
 

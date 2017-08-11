@@ -12,13 +12,18 @@ var ClassSchma = new mongoose.Schema({
     title: String,
     subtitle: String,
     price:String,
+    content:String,
+    record:Boolean,
     start:Date,
     end:Date,
+    author:String,
     telphone:String,
     lecture:String,
+    lecturename:String,
     status:String,
     images:{type:Array,default:[]},
-    schedules:{type:Array,default:[]}
+    schedules:{type:Array,default:[]},
+    joins:{type:Array,default:[]}
 });
 
 ClassSchma.methods.add = function (callback) {
