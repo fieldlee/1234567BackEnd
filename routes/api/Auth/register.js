@@ -32,8 +32,7 @@ router.get('/:key', function(req, res) {
 
 router.post('/', function(req, res) {
     var body = req.body;
-    // console.log("*****");
-    // console.log(body);
+
     var requestJson = body;
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
@@ -50,14 +49,7 @@ router.post('/', function(req, res) {
             return
         }
     }
-    console.log(requestJson["_id"]);
-    // username: String,
-    //     admin: String,
-    //     password:String,
-    //     phone:String,
-    //     email:Date,
-    //     registerTime:Date,
-    //     avator:String
+
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         User.getUserById(requestJson["_id"],function (result) {
             result.username = requestJson["username"];
@@ -83,22 +75,10 @@ router.post('/', function(req, res) {
         user.email = requestJson["email"];
         user.avator = requestJson["avator"];
         user.registerTime = new Date();
-        if (requestJson["avatorPath"]){
-            user.avatorPath = requestJson["avatorPath"];
-        }else{
-            user.avatorPath = "./public/img/boy1.png";
-        }
-        if (requestJson["backgroundPath"]){
-            user.backgroundPath = requestJson["backgroundPath"];
-        }else{
-            user.backgroundPath = "./public/img/background1.png";
-        }
         user.add(function (err) {
             console.log(err);
             var token= config.getToken(requestJson["username"]);
-
             var jsonResult = {"success": true,"data":user,"token":token};
-
             res.json(jsonResult);
         })
     }

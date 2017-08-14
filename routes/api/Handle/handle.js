@@ -25,9 +25,9 @@ module.exports = {
                 Forum.getByUsername(user.username,function (results) {
                     user.issueCount = results.length;
                     if (user.issueCount>=50){
-                        user.lvl = "银会员";
+                        user.lvl = "白银会员";
                     }else if(user.issueCount>=100){
-                        user.lvl = "金会员";
+                        user.lvl = "黄金会员";
                     }else if(user.issueCount>=200){
                         user.lvl = "钻石会员";
                     }

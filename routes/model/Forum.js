@@ -24,6 +24,7 @@ var ForumSchma = new mongoose.Schema({
     fromTime:String,
     images:Array,
     videos:Array,
+    topup:{type:Boolean,default:false},
     comment:Number,
     read:Number,
     support:Number,
@@ -34,38 +35,67 @@ ForumSchma.methods.add = function (callback) {
     this.save().then(callback);
 };
 
+ForumSchma.statics.getTop = function (type,callback) {
+    this.find({"type":type,"topup":true}).sort({"issueTime":-1}).then(callback);
+};
+
 ForumSchma.statics.getTypes = function (type,callback) {
-    this.find({"type":type}).sort({"issueTime":-1}).then(callback);
+    this.find({"type":type,"topup":{"$ne":true}}).sort({"issueTime":-1}).then(callback);
 };
 
 ForumSchma.statics.getRecentForums = function (callback) {
     this.find({}).sort({"issueTime":-1}).limit(15).then(callback);
 };
 
+ForumSchma.statics.getTopSubType = function (type,subtype,callback) {
+    if(subtype=="其他"){
+        switch (type){
+            case "键盘乐器":
+                this.find({"type":type,"subType":{$nin:["钢琴"]},"topup":true}).sort({"issueTime":-1}).then(callback);
+                break;
+            case "管式乐器":
+                this.find({"type":type,"subType":{$nin:["萨克斯"]},"topup":true}).sort({"issueTime":-1}).then(callback);
+                break;
+            case "拉弦乐器":
+                this.find({"type":type,"subType":{$nin:["小提琴","吉他"]},"topup":true}).sort({"issueTime":-1}).then(callback);
+                break;
+            case "弹拨乐器":
+                this.find({"type":type,"subType":{$nin:["琵琶"]},"topup":true}).sort({"issueTime":-1}).then(callback);
+                break;
+            default:
+                this.find({"type":type,"subType":subtype,"topup":true}).sort({"issueTime":-1}).then(callback);
+        }
+    }else{
+        this.find({"type":type,"subType":subtype,"topup":true}).sort({"issueTime":-1}).then(callback);
+    }
+
+};
+
+
 ForumSchma.statics.getTypeAndSubType = function (type,subtype,callback) {
     if(subtype=="其他"){
         switch (type){
             case "键盘乐器":
-                this.find({"type":type,"subType":{$nin:["钢琴"]}}).sort({"issueTime":-1}).then(callback);
+                this.find({"type":type,"subType":{$nin:["钢琴"]},"topup":{"$ne":true}}).sort({"issueTime":-1}).then(callback);
                 break;
             case "管式乐器":
-                this.find({"type":type,"subType":{$nin:["萨克斯"]}}).sort({"issueTime":-1}).then(callback);
+                this.find({"type":type,"subType":{$nin:["萨克斯"]},"topup":{"$ne":true}}).sort({"issueTime":-1}).then(callback);
                 break;
             case "拉弦乐器":
-                this.find({"type":type,"subType":{$nin:["小提琴","吉他"]}}).sort({"issueTime":-1}).then(callback);
+                this.find({"type":type,"subType":{$nin:["小提琴","吉他"]},"topup":{"$ne":true}}).sort({"issueTime":-1}).then(callback);
                 break;
             case "弹拨乐器":
-                this.find({"type":type,"subType":{$nin:["琵琶"]}}).sort({"issueTime":-1}).then(callback);
+                this.find({"type":type,"subType":{$nin:["琵琶"]},"topup":{"$ne":true}}).sort({"issueTime":-1}).then(callback);
                 break;
                 //管式乐器  //萨克斯
                 //拉弦乐器  小提琴","吉他
                 //弹拨乐器  琵琶
                 //
             default:
-                this.find({"type":type,"subType":subtype}).sort({"issueTime":-1}).then(callback);
+                this.find({"type":type,"subType":subtype,"topup":{"$ne":true}}).sort({"issueTime":-1}).then(callback);
         }
     }else{
-        this.find({"type":type,"subType":subtype}).sort({"issueTime":-1}).then(callback);
+        this.find({"type":type,"subType":subtype,"topup":{"$ne":true}}).sort({"issueTime":-1}).then(callback);
     }
 
 };

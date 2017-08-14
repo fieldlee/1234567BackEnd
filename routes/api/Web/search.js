@@ -20,26 +20,18 @@ router.post('/', function(req, res) {
         async.series({
                 one: function(callback){
                     Product.searchProducts(requestJson["key"],function (results) {
-                        console.log(results);
                         callback(null,results);
                     });
                 },
                 two: function(callback){
                     Forum.searchForums(requestJson["key"],function (results) {
-                        console.log(results);
                         var handleResults = new Array();
                         if (results.length>0){
                             for (var i = 0, len = results.length; i < len; i++) {
-                                User.getUserByObj(results[i], function (userResult, obj) {
-                                    obj.avator = userResult.avator;
-                                    obj.avatorPath = userResult.avatorPath;
-                                    obj.fromTime = config.preTime(obj.issueTime);
-                                    handleResults.push(obj);
-                                    if(handleResults.length == results.length){
-                                        callback(null,handleResults);
-                                    }
-                                });
+                                results[i].fromTime = config.preTime(results[i].issueTime);
+                                handleResults.push(results[i]);
                             }
+                            callback(null,handleResults);
                         }else{
                             callback(null,handleResults);
                         }
@@ -48,7 +40,6 @@ router.post('/', function(req, res) {
                 }
             },
             function(err, results) {
-                console.log("------");
                 if (err==null){
                     var resultJson = {};
                     resultJson["forums"] = results.two;

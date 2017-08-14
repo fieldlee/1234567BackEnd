@@ -21,37 +21,18 @@ var Comment = require('../../../model/Comment');
 
 router.get('/recent',function (req,res) {
     Forum.getRecentForums(function (results) {
-        var handleResults = new Array();
-        for(var i=0;i<results.length;i++){
-            User.getUserByObj(results[i],function (userResult,obj) {
-                if (userResult == null){
-                    obj.avator = "匿名用户";
-                    obj.avatorPath = "";
-                    obj.fromTime = config.preTime(obj.issueTime);
-                }else{
-                    obj.avator = userResult.avator;
-                    obj.avatorPath = userResult.avatorPath;
-                    obj.fromTime = config.preTime(obj.issueTime);
-                }
-
-
-                handleResults.push(obj);
-                if(results.length == handleResults.length){
-                    var sortedResults = handleResults.sort(function (o,t) {
-                        var oT = new Date(o.issueTime);
-                        var tT = new Date(t.issueTime);
-                        if (oT > tT){
-                            return -1;
-                        }else{
-                            return 1;
-                        }
-                    });
-                    var jsonResult = {"success":true,"results":sortedResults};
-                    res.json(jsonResult);
-                    return;
-                }
-            })
-        }
+        var sortedResults = results.sort(function (o,t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT){
+                return -1;
+            }else{
+                return 1;
+            }
+        });
+        var jsonResult = {"success":true,"results":sortedResults};
+        res.json(jsonResult);
+        return;
     });
 });
 
@@ -72,6 +53,28 @@ router.get('/support/:id',function (req, res) {
     }
 });
 
+router.get('/topup/:id',function (req, res) {
+    if (req.params.id){
+        Forum.getForumById(req.params.id,function (result) {
+            if(result.topup==true){
+                result.topup = false;
+                result.add(function (err) {
+                    var jsonResult = {"success":false,"message":"取消置顶该帖子"};
+                    res.json(jsonResult)
+                });
+            }else{
+                result.topup = true;
+                result.add(function (err) {
+                    var jsonResult = {"success":true,"message":"已经成功置顶该帖子"};
+                    res.json(jsonResult)
+                });
+            }
+
+        });
+    }
+});
+
+
 router.get('/byid/:id',function (req, res) {
     if (req.params.id){
         Forum.getForumById(req.params.id,function (result) {
@@ -85,13 +88,8 @@ router.get('/byid/:id',function (req, res) {
             result.add(function (err) {  // 记录查看次数加1
 
             });
-            User.getUserByObj(result,function (userResult,obj) {
-                obj.avator = userResult.avator;
-                obj.avatorPath = userResult.avatorPath;
-                obj.fromTime = config.preTime(obj.issueTime);
-                var jsonResult = {"success":true,"data":obj};
-                res.json(jsonResult)
-            })
+            var jsonResult = {"success":true,"data":result};
+            res.json(jsonResult)
         });
     }
 });
@@ -100,29 +98,18 @@ router.get('/byusername/:username', function(req, res) {
     var username = req.params.username;
     if(username){
         Forum.getByUsername(username,function (results) {
-            var handleResults = new Array();
-            for (var i = 0; i < results.length; i++) {
-                User.getUserByObj(results[i],function (userResult,obj) {
-                    obj.avator = userResult.avator;
-                    obj.avatorPath = userResult.avatorPath;
-                    obj.fromTime = config.preTime(obj.issueTime);
-                    handleResults.push(obj);
-                    if(results.length == handleResults.length) {
-                        var sortedResults = handleResults.sort(function (o, t) {
-                            var oT = new Date(o.issueTime);
-                            var tT = new Date(t.issueTime);
-                            if (oT > tT) {
-                                return -1;
-                            } else {
-                                return 1;
-                            }
-                        });
-                        var jsonResult = {"success":true,"results":sortedResults};
-                        res.json(jsonResult);
-                        return;
-                    }
-                })
-            }
+            var sortedResults = results.sort(function (o, t) {
+                var oT = new Date(o.issueTime);
+                var tT = new Date(t.issueTime);
+                if (oT > tT) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            });
+            var jsonResult = {"success":true,"results":sortedResults};
+            res.json(jsonResult);
+            return;
         });
     }else{
         var jsonResult = {"success":false};

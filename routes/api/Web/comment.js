@@ -8,86 +8,36 @@ var Comment = require('../../model/Comment');
 var User = require('../../model/User');
 var Forum = require('../../model/Forum');
 var News = require('../../model/News');
+var async = require('async');
 
 router.get('/:pid',function (req,res) {
    if (req.params.pid) {
        Comment.getCommentsByPId(req.params.pid,function (results) {
-           var handleResults = new Array();
-           for (var i = 0, len = results.length; i < len; i++) {
-               console.log(results[i].issueTime);
-               User.getUserByObj(results[i],function (userResult,obj) {
-                   if(userResult==null){
-                       obj.avator = "匿名用户";
-                       obj.avatorPath = "";
-                       obj.fromTime = config.preTime(obj.issueTime);
-                   }else{
-                       obj.avator = userResult.avator;
-                       obj.avatorPath = userResult.avatorPath;
-                       obj.fromTime = config.preTime(obj.issueTime);
+           async.mapLimit(results,1,function (item,callback) {
+               Comment.getCommentsByPId(item._id,function (commentResults) {
+                   for (var j = 0; j < commentResults.length; j++) {
+                       commentResults[j].fromTime = config.preTime(commentResults[j].issueTime);
                    }
-                   Comment.getCommentsByPId(obj._id,function (commentResults) {
-                       if(commentResults.length>0){
-                           var commentuserResults = new Array();
-                           for (var j = 0, jlen = commentResults.length; j < jlen; j++) {
-                               User.getUserByObj(commentResults[j],function (userResult2,commentObj) {
-                                   if(userResult2==null){
-                                       commentObj.avator = "匿名用户";
-                                       commentObj.avatorPath = "";
-                                       commentObj.fromTime = config.preTime(commentObj.issueTime);
-                                   }else{
-                                       commentObj.avator = userResult2.avator;
-                                       commentObj.avatorPath = userResult2.avatorPath;
-                                       commentObj.fromTime = config.preTime(commentObj.issueTime);
-                                   }
-
-                                   commentuserResults.push(commentObj);
-                                   if (commentResults.length == commentuserResults.length){
-                                       obj.subComments = commentuserResults;
-
-                                       handleResults.push(obj);
-
-                                       if(results.length == handleResults.length){
-                                           var sortedResults = handleResults.sort(function (o,t) {
-                                               var oT = new Date(o.issueTime);
-                                               var tT = new Date(t.issueTime);
-                                               if (oT > tT){
-                                                   return -1;
-                                               }else{
-                                                   return 1;
-                                               }
-                                           });
-
-                                           var jsonResult = {success:true,results:sortedResults,count:sortedResults.length};
-                                           res.json(jsonResult)
-                                       }
-                                   }
-                               });
-
-                           }
-                       }else{ ////
-                           obj.subComments = [];
-
-                           handleResults.push(obj);
-
-                           if(results.length == handleResults.length){
-                               var sortedResults = handleResults.sort(function (o,t) {
-                                   var oT = new Date(o.issueTime);
-                                   var tT = new Date(t.issueTime);
-                                   if (oT > tT){
-                                       return -1;
-                                   }else{
-                                       return 1;
-                                   }
-                               });
-
-                               var jsonResult = {success:true,results:sortedResults,count:sortedResults.length};
-                               res.json(jsonResult)
-                           }
-                       }
-
-                   });
+                   item.subComments = commentuserResults;
+                   callback(null,item);
                });
-           }
+           },function (err,items) {
+               var sortedResults = items.sort(function (o,t) {
+                   var oT = new Date(o.issueTime);
+                   var tT = new Date(t.issueTime);
+                   if (oT > tT){
+                       return -1;
+                   }else{
+                       return 1;
+                   }
+               });
+               for (var i = 0; i < sortedResults.length; i++) {
+                   sortedResults[i].fromTime = config.preTime(sortedResults[i].issueTime);
+               }
+               var jsonResult = {success:true,results:sortedResults,count:sortedResults.length};
+               res.json(jsonResult);
+               return;
+           });
 
        });
    }
@@ -113,82 +63,36 @@ router.get('/:pid/:page',function (req,res) {
             }
 
             for (var i = startLen; i < endLen; i++) {
-
-                User.getUserByObj(results[i],function (userResult,obj) {
-                    if(userResult==null){
-                        obj.avator = "匿名用户";
-                        obj.avatorPath = "";
-                        obj.fromTime = config.preTime(obj.issueTime);
-                    }else{
-                        obj.avator = userResult.avator;
-                        obj.avatorPath = userResult.avatorPath;
-                        obj.fromTime = config.preTime(obj.issueTime);
-                    }
-                    Comment.getCommentsByPId(obj._id,function (commentResults) {
-                        if(commentResults.length>0){
-                            var commentuserResults = new Array();
-                            for (var j = 0, jlen = commentResults.length; j < jlen; j++) {
-                                User.getUserByObj(commentResults[j],function (userResult2,commentObj) {
-                                    if(userResult2==null){
-                                        commentObj.avator = "匿名用户";
-                                        commentObj.avatorPath = "";
-                                        commentObj.fromTime = config.preTime(commentObj.issueTime);
-                                    }else{
-                                        commentObj.avator = userResult2.avator;
-                                        commentObj.avatorPath = userResult2.avatorPath;
-                                        commentObj.fromTime = config.preTime(commentObj.issueTime);
-                                    }
-
-                                    commentuserResults.push(commentObj);
-                                    if (commentResults.length == commentuserResults.length){
-                                        obj.subComments = commentuserResults;
-
-                                        handleResults.push(obj);
-
-                                        if((endLen-startLen) == handleResults.length){
-                                            var sortedResults = handleResults.sort(function (o,t) {
-                                                var oT = new Date(o.issueTime);
-                                                var tT = new Date(t.issueTime);
-                                                if (oT > tT){
-                                                    return -1;
-                                                }else{
-                                                    return 1;
-                                                }
-                                            });
-
-                                            var jsonResult = {success:true,results:sortedResults,count:results.length};
-                                            res.json(jsonResult);
-                                            return;
-                                        }
-                                    }
-                                });
-
-                            }
-                        }else{ ////
-                            obj.subComments = [];
-
-                            handleResults.push(obj);
-
-                            if((endLen-startLen) == handleResults.length){
-                                var sortedResults = handleResults.sort(function (o,t) {
-                                    var oT = new Date(o.issueTime);
-                                    var tT = new Date(t.issueTime);
-                                    if (oT > tT){
-                                        return -1;
-                                    }else{
-                                        return 1;
-                                    }
-                                });
-
-                                var jsonResult = {success:true,results:sortedResults,count:results.length};
-                                res.json(jsonResult);
-                                return;
-                            }
-                        }
-
-                    });
-                });
+                handleResults.push(results[i]);
             }
+            async.mapLimit(handleResults,1,function (item,callback) {
+                item.fromTime = config.preTime(item.issueTime)
+                Comment.getCommentsByPId(item._id,function (commentResults) {
+                    for(var j=0;j<commentResults.length;j++){
+                        commentResults[j].fromTime = config.preTime(commentResults[j].issueTime);
+                    }
+                    item.subComments = commentResults;
+                    callback(null,item);
+                });
+            },function (err,items) {
+                var sortedResults = items.sort(function (o,t) {
+                    var oT = new Date(o.issueTime);
+                    var tT = new Date(t.issueTime);
+                    if (oT > tT){
+                        return -1;
+                    }else{
+                        return 1;
+                    }
+                });
+
+                for(var k=0;k<sortedResults.length;k++){
+                    sortedResults[k].fromTime = config.preTime(sortedResults[k].issueTime);
+                }
+
+                var jsonResult = {success:true,results:sortedResults,count:sortedResults.length};
+                res.json(jsonResult);
+                return;
+            });
 
         });
     }
@@ -235,12 +139,26 @@ router.post('/', function(req, res) {
                 }
 
             });
-            result.add(function (err) {
-                console.log(err);
-                var jsonResult = {"success":true,"data":result};
-                res.json(jsonResult);
-            });
 
+
+            if(requestJson["author"] != null && requestJson["author"] != ""){
+                User.getUserByUserName(requestJson["author"],function (user) {
+                    result.avator = user.avator;
+                    result.avatorPath = user.avatorPath;
+                    result.add(function (err) {
+                        var jsonResult = {"success":true,"data":result};
+                        res.json(jsonResult);
+                        return;
+                    });
+                });
+            }
+            else{
+                result.add(function (err) {
+                    var jsonResult = {"success":true,"data":result};
+                    res.json(jsonResult);
+                    return;
+                })
+            }
         });
     }else{
 
@@ -276,11 +194,26 @@ router.post('/', function(req, res) {
             }
 
         });
-        comment.add(function (err) {
-            console.log(err);
-            var jsonResult = {"success":true,"data":comment};
-            res.json(jsonResult);
-        })
+
+
+        if(requestJson["author"] != null && requestJson["author"] != ""){
+            User.getUserByUserName(requestJson["author"],function (user) {
+                comment.avator = user.avator;
+                comment.avatorPath = user.avatorPath;
+                comment.add(function (err) {
+                    var jsonResult = {"success":true,"data":comment};
+                    res.json(jsonResult);
+                    return;
+                });
+            });
+        }
+        else{
+            comment.add(function (err) {
+                var jsonResult = {"success":true,"data":comment};
+                res.json(jsonResult);
+                return;
+            })
+        }
     }
 
 });

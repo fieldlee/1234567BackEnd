@@ -15,6 +15,7 @@ var User = require('../../model/User');
 var Comment = require('../../model/Comment');
 var ffmpeg = require('fluent-ffmpeg');
 var uuid = require('node-uuid');
+var async = require('async');
 /* GET users listing. */
 // req.params.type
 
@@ -30,16 +31,67 @@ router.use('/sub', require('./subForum/subForum'));
 
 router.get('/', function(req, res) {
     Forum.getAll(function (results) {
-
         var handleResults = new Array();
         for (var i = 0, len = results.length; i < len; i++) {
-            User.getUserByObj(results[i],function (userResult,obj) {
-                obj.avator = userResult.avator;
-                obj.avatorPath = userResult.avatorPath;
-                obj.fromTime = config.preTime(obj.issueTime);
 
-                handleResults.push(obj);
-                if(results.length == handleResults.length){
+            results[i].fromTime = config.preTime(results[i].issueTime);
+
+            handleResults.push(results[i]);
+        }
+
+        var sortedResults = handleResults.sort(function (o,t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT){
+                return -1;
+            }else{
+                return 1;
+            }
+        });
+        var jsonResult = {success:true,results:sortedResults};
+        res.json(jsonResult);
+    });
+});
+
+
+router.get('/:type/:page', function(req, res) {
+    var pageSize = 10;
+    var page = new Number(req.params.page);
+    if (req.params.type){
+        async.series({
+            one: function(callback){
+                if (page<=1){
+                    Forum.getTop(req.params.type,function (results) {
+                        for(var i =0 ;i<results.length;i++){
+                            results[i].fromTime = config.preTime(results[i].issueTime);
+                        }
+                        callback(null,results);
+                    });
+                }else {
+                    callback(null, []);
+                }
+            },
+            two: function(callback){
+                Forum.getTypes(req.params.type,function (results) {
+
+                    var handleResults = new Array();
+                    var len = 0;
+                    if (results.length>=page*pageSize){
+                        len = page*pageSize;
+                    }else{
+                        len = results.length;
+                    }
+                    if((page-1)*pageSize >= results.length){
+                        // var jsonResult = {success:true,page:page,results:[],count:results.length};
+                        // res.json(jsonResult);
+                        // return;
+                        callback(null, []);
+                    }
+                    for (var i = (page-1)*pageSize; i < len; i++) {
+                        results[i].fromTime = config.preTime(results[i].issueTime);
+                        // config.getImageUrls(results[i].content);
+                        handleResults.push(results[i]);
+                    }
                     var sortedResults = handleResults.sort(function (o,t) {
                         var oT = new Date(o.issueTime);
                         var tT = new Date(t.issueTime);
@@ -49,62 +101,18 @@ router.get('/', function(req, res) {
                             return 1;
                         }
                     });
-                    var jsonResult = {success:true,results:sortedResults};
-                    res.json(jsonResult);
-                }
-            })
-        }
-
-    });
-});
-
-
-router.get('/:type/:page', function(req, res) {
-    var pageSize = 10;
-    var page = new Number(req.params.page);
-    if (req.params.type){
-        Forum.getTypes(req.params.type,function (results) {
-            var handleResults = new Array();
-            var len = 0;
-            if (results.length>=page*pageSize){
-                len = page*pageSize;
-            }else{
-                len = results.length;
+                    callback(null,sortedResults);
+                });
             }
-            if((page-1)*pageSize >= results.length){
-                var jsonResult = {success:true,page:page,results:[],count:results.length};
-                res.json(jsonResult);
-                return;
-            }
-            for (var i = (page-1)*pageSize; i < len; i++) {
-                User.getUserByObj(results[i],function (userResult,obj) {
-                    if (userResult == null){
-                        obj.avator = "匿名用户";
-                        obj.avatorPath = "";
-                        obj.fromTime = config.preTime(obj.issueTime);
-                    }else{
-                        obj.avator = userResult.avator;
-                        obj.avatorPath = userResult.avatorPath;
-                        obj.fromTime = config.preTime(obj.issueTime);
-                    }
-                    config.getImageUrls(obj.content);
-                        handleResults.push(obj);
-                        if((len - (page-1)*pageSize) == handleResults.length){
-                            var sortedResults = handleResults.sort(function (o,t) {
-                                var oT = new Date(o.issueTime);
-                                var tT = new Date(t.issueTime);
-                                if (oT > tT){
-                                    return -1;
-                                }else{
-                                    return 1;
-                                }
-                            });
-                            var jsonResult = {success:true,page:page,results:sortedResults,count:sortedResults.length};
-                            res.json(jsonResult)
-                        }
-                })
-            }
+        },function (err,Results) {
+
+            var returnResults = Results.one.concat(Results.two);
+            console.log(returnResults);
+            var jsonResult = {success:true,page:page,results:returnResults,count:returnResults.length};
+            res.json(jsonResult);
+            return;
         });
+
     }
 
 });
@@ -114,50 +122,61 @@ router.get('/:type/:subtype/:page', function(req, res) {
     var pageSize = 10;
     var page = new Number(req.params.page);
     if (req.params.type && req.params.subtype) {
-
-        Forum.getTypeAndSubType(req.params.type,req.params.subtype,function (results) {
-            var handleResults = new Array();
-
-            var len = 0 ;
-            if (results.length>=page*pageSize){
-                len = page*pageSize;
-            }else{
-                len = results.length;
-            }
-            // 没有数据
-            if((page-1)*pageSize >= results.length){
-                var jsonResult = {success:true,page:page,results:[],count:results.length};
-                res.json(jsonResult);
-                return;
-            }
-            for (var i = (page-1)*pageSize; i < len; i++) {
-                User.getUserByObj(results[i],function (userResult,obj) {
-                    if (userResult==null){
-                        obj.avator = "匿名用户";
-                        obj.avatorPath = "";
-                        obj.fromTime = config.preTime(obj.issueTime);
-                    }else{
-                        obj.avator = userResult.avator;
-                        obj.avatorPath = userResult.avatorPath;
-                        obj.fromTime = config.preTime(obj.issueTime);
-                    }
-
-                        handleResults.push(obj);
-                        if((len - (page-1)*pageSize) == handleResults.length) {
-                            var sortedResults = handleResults.sort(function (o, t) {
-                                var oT = new Date(o.issueTime);
-                                var tT = new Date(t.issueTime);
-                                if (oT > tT) {
-                                    return -1;
-                                } else {
-                                    return 1;
-                                }
-                            });
-                            var jsonResult = {success: true, page:page, results: sortedResults, count: sortedResults.length};
-                            res.json(jsonResult)
+        async.series({
+            one: function(callback){
+                if (page<=1){
+                    Forum.getTopSubType(req.params.type,req.params.subtype,function (results) {
+                        for (var i = 0; i < results.length; i++) {
+                            results[i].fromTime = config.preTime(results[i].issueTime);
                         }
-                })
+                        callback(null,results);
+                    });
+                }else{
+                    callback(null,[]);
+                }
+
+            },
+            two: function(callback) {
+                Forum.getTypeAndSubType(req.params.type,req.params.subtype,function (results) {
+
+                    var handleResults = new Array();
+
+                    var len = 0 ;
+                    if (results.length>=page*pageSize){
+                        len = page*pageSize;
+                    }else{
+                        len = results.length;
+                    }
+                    // 没有数据
+                    if((page-1)*pageSize >= results.length){
+                        // var jsonResult = {success:true,page:page,results:[],count:results.length};
+                        // res.json(jsonResult);
+                        // return;
+                        callback(null,[]);
+                    }
+                    for (var i = (page-1)*pageSize; i < len; i++) {
+                        results[i].fromTime = config.preTime(results[i].issueTime);
+                        handleResults.push(results[i]);
+                    }
+                    var sortedResults = handleResults.sort(function (o, t) {
+                        var oT = new Date(o.issueTime);
+                        var tT = new Date(t.issueTime);
+                        if (oT > tT) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    });
+                    callback(null,sortedResults);
+                });
             }
+        },function (err,Results) {
+            console.log(Results);
+            var returnResults = Results.one.concat(Results.two);
+
+            var jsonResult = {success: true, page:page, results: returnResults, count: returnResults.length};
+            res.json(jsonResult);
+            return;
         });
     }
 });
@@ -192,6 +211,9 @@ router.post('/', function(req, res) {
             result.tags =   requestJson["tags"];
             result.videos =   requestJson["videos"];
             result.images =   requestJson["images"];
+
+
+
             if (result.videos.length>0){
                 //Save thumbnail image
                 var filename = uuid.v4()+".png";
@@ -215,10 +237,22 @@ router.post('/', function(req, res) {
                         size: '200x150'
                     });
             }
-            result.add(function (err) {
-                var jsonResult = {"success":true,"data":result};
-                res.json(jsonResult);
-            });
+            if(requestJson["author"] != null && requestJson["author"] != ""){
+                User.getUserByUserName(requestJson["author"],function (user) {
+                    result.avator = user.avator;
+                    result.avatorPath = user.avatorPath;
+                    result.add(function (err) {
+                        var jsonResult = {"success":true,"data":result};
+                        res.json(jsonResult);
+                    });
+                });
+            }
+            else{
+                result.add(function (err) {
+                    var jsonResult = {"success":true,"data":result};
+                    res.json(jsonResult);
+                });
+            }
 
         });
     }else{
@@ -259,11 +293,26 @@ router.post('/', function(req, res) {
                     size: '200x150'
                 });
         }
-        forum.add(function (err) {
-            console.log(err);
-            var jsonResult = {"success":true,"data":forum};
-            res.json(jsonResult);
-        })
+
+        if(requestJson["author"] != null && requestJson["author"] != ""){
+            User.getUserByUserName(requestJson["author"],function (user) {
+                forum.avator = user.avator;
+                forum.avatorPath = user.avatorPath;
+                forum.add(function (err) {
+                    var jsonResult = {"success":true,"data":forum};
+                    res.json(jsonResult);
+                    return;
+                });
+            });
+        }
+        else{
+            forum.add(function (err) {
+                var jsonResult = {"success":true,"data":forum};
+                res.json(jsonResult);
+                return;
+            })
+        }
+
     }
 
 });

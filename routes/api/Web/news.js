@@ -34,15 +34,10 @@ router.get('/byid/:id',function (req,res) {
         result.add(function (err) {  // 记录查看次数加1
 
         });
-        User.getUserByObj(result,function (userResult,obj) {
-            obj.avator = userResult.avator;
-            obj.avatorPath = userResult.avatorPath;
-            obj.fromTime = config.preTime(obj.issueTime);
-
-            var jsonResult = {success:true,data:obj};
-            res.json(jsonResult);
-            return;
-        });
+        result.fromTime = config.preTime(result.issueTime);
+        var jsonResult = {success:true,data:result};
+        res.json(jsonResult);
+        return;
     });
 });
 
@@ -64,39 +59,22 @@ router.get('/:page', function(req, res) {
             res.json(jsonResult);
             return;
         }
-
         for (var i = (page-1)*pageSize; i < len; i++) {
-            User.getUserByObj(results[i],function (userResult,obj) {
-
-                if(userResult != null){
-                    if(userResult.avator != null){
-                        obj.avator = userResult.avator;
-                    }
-                    if (userResult.avatorPath != null){
-                        obj.avatorPath = userResult.avatorPath;
-                    }
-                }
-
-                obj.fromTime = config.preTime(obj.issueTime);
-                handleResults.push(obj);
-                if((len - (page-1)*pageSize) == handleResults.length) {
-                    var sortedResults = handleResults.sort(function (o, t) {
-                        var oT = new Date(o.issueTime);
-                        var tT = new Date(t.issueTime);
-                        if (oT > tT) {
-                            return -1;
-                        } else {
-                            return 1;
-                        }
-                    });
-                    var jsonResult = {success: true, page:page, results: sortedResults, count: sortedResults.length};
-
-                    res.json(jsonResult);
-
-                    return;
-                }
-            })
+            results[i].fromTime = config.preTime(results[i].issueTime);
+            handleResults.push(results[i]);
         }
+        var sortedResults = handleResults.sort(function (o, t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        var jsonResult = {success: true, page:page, results: sortedResults, count: results.length};
+        res.json(jsonResult);
+        return;
     });
 });
 
@@ -116,11 +94,25 @@ router.post('/', function(req, res) {
             result.issueTime =   requestJson["issueTime"];
             result.avator =   requestJson["avator"];
             result.images =   requestJson["images"];
-            result.add(function (err) {
-                console.log(err);
-                var jsonResult = {"success": true,"data":result};
-                res.json(jsonResult);
-            });
+
+            if(requestJson["author"] != null && requestJson["author"] != ""){
+                User.getUserByUserName(requestJson["author"],function (user) {
+                    result.avator = user.avator;
+                    result.avatorPath = user.avatorPath;
+                    result.add(function (err) {
+                        var jsonResult = {"success":true,"data":result};
+                        res.json(jsonResult);
+                        return;
+                    });
+                });
+            }
+            else{
+                result.add(function (err) {
+                    var jsonResult = {"success":true,"data":result};
+                    res.json(jsonResult);
+                    return;
+                })
+            }
         });
     }else{
 
@@ -132,11 +124,27 @@ router.post('/', function(req, res) {
         news.issueTime =   requestJson["issueTime"];
         news.avator =   requestJson["avator"];
         news.images =   requestJson["images"];
-        news.add(function (err) {
-            console.log(err);
-            var jsonResult = {"success": true,"data":news};
-            res.json(jsonResult);
-        })
+
+
+        if(requestJson["author"] != null && requestJson["author"] != ""){
+            User.getUserByUserName(requestJson["author"],function (user) {
+                news.avator = user.avator;
+                news.avatorPath = user.avatorPath;
+                news.add(function (err) {
+                    var jsonResult = {"success":true,"data":news};
+                    res.json(jsonResult);
+                    return;
+                });
+            });
+        }
+        else{
+            news.add(function (err) {
+                console.log(err);
+                var jsonResult = {"success": true,"data":news};
+                res.json(jsonResult);
+            })
+        }
+
     }
 
 });

@@ -21,6 +21,38 @@ router.get('/:username',function (req,res) {
     });
 });
 
+router.post('/update/avator/:username', function(req, res) {
+    var body = req.body.data;
+    // var body = req.body;
+    console.log(body);
+    var username = req.params.username;
+    User.getUserByUserName(username,function (result) {
+        result.avatorPath = body;
+        result.updateTime = new Date();
+        result.add(function (err) {
+            var jsonResult = {"success": true,"data":result};
+            res.json(jsonResult);
+            return;
+        });
+    });
+});
+
+router.post('/update/back/:username', function(req, res) {
+    var body = req.body.data;
+    // var body = req.body;
+    console.log(body);
+    var username = req.params.username;
+    User.getUserByUserName(username,function (result) {
+        result.backgroundPath = body;
+        result.updateTime = new Date();
+        result.add(function (err) {
+            var jsonResult = {"success": true,"data":result};
+            res.json(jsonResult);
+            return;
+        });
+    });
+});
+
 
 router.post('/update', function(req, res) {
     var body = req.body;
@@ -42,13 +74,17 @@ router.post('/update', function(req, res) {
     //     sex:String,
     //     focus:Array,
     //     skills:Array
+
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined) {
         User.getUserById(requestJson["_id"],function (result) {
             result.phone = requestJson["phone"];
             result.email = requestJson["email"];
             result.avator = requestJson["avator"];
-            result.avatorPath = requestJson["avatorPath"];
-            result.birthday = requestJson["birthday"];
+            // result.avatorPath = requestJson["avatorPath"];
+            if(requestJson["birthday"] != null && requestJson["birthday"] != ""){
+                result.birthday = new Date(requestJson["birthday"]) ;
+            }
+
             result.province = requestJson["province"];
             result.city = requestJson["city"];
             result.district = requestJson["district"];
@@ -56,6 +92,7 @@ router.post('/update', function(req, res) {
             result.sex = requestJson["sex"];
             result.focus = requestJson["focus"];
             result.skills = requestJson["skills"];
+            result.updateTime = new Date();
             result.add(function (err) {
                 var jsonResult = {"success": true,"message":"客户信息已更新","data":result};
                 res.json(jsonResult);

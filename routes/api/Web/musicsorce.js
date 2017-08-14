@@ -9,19 +9,8 @@ var async = require('async');
 router.get('/:type', function(req, res) {
     MusicSorce.getSorcesByType(function (results) {
         async.mapLimit(results,1,function (item,callback) {
-            User.getUserByObj(item,function (userResult,obj) {
-                if (userResult == null) {
-                    obj.avator = "匿名用户";
-                    obj.avatorPath = "";
-                    obj.fromTime = config.preTime(obj.issueTime);
-                } else {
-                    obj.avator = userResult.avator;
-                    obj.avatorPath = userResult.avatorPath;
-                    obj.fromTime = config.preTime(obj.issueTime);
-                }
-                callback(null,obj);
-            });
-
+            item.fromTime = config.preTime(obj.issueTime);
+            callback(null,item);
         }, function(err,limitResult) {
             console.info('error==>' + err);
             var jsonResult = {"success":true,"results":limitResult};
@@ -34,20 +23,10 @@ router.get('/:type', function(req, res) {
 
 router.get('/:id', function(req, res) {
     MusicSorce.getSorceById(req.params.id,function (result) {
-        User.getUserByObj(result,function (userResult,obj) {
-            if (userResult == null) {
-                obj.avator = "匿名用户";
-                obj.avatorPath = "";
-                obj.fromTime = config.preTime(obj.issueTime);
-            } else {
-                obj.avator = userResult.avator;
-                obj.avatorPath = userResult.avatorPath;
-                obj.fromTime = config.preTime(obj.issueTime);
-            }
-            var jsonResult = {"success":true,"data":obj};
-            res.json(jsonResult);
-            return;
-        });
+        result.fromTime = config.preTime(result.issueTime);
+        var jsonResult = {"success":true,"data":result};
+        res.json(jsonResult);
+        return;
     })
 });
 
