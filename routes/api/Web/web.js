@@ -41,5 +41,6 @@ router.use('/praise', require('./praise'));
 router.use('/collect', require('./collect'));
 router.use('/search', require('./search'));
 router.use('/class', require('./class'));
+router.use('/score', require('./score'));
 //exports
 module.exports = router;

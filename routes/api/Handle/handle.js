@@ -3,6 +3,7 @@
  */
 var config = require('../config');
 var Forum = require('../../model/Forum');
+var News = require('../../model/News');
 var User = require('../../model/User');
 var Product = require('../../model/Product');
 var ConfigPraise = require('../../model/ConfigPraise');
@@ -136,6 +137,64 @@ module.exports = {
             }, function(err,limitResult) {
                 console.info('error==>' + err);
                 console.info('limitResult==>' + limitResult);
+            });
+        });
+    },
+
+    updateUserAvator:function () {
+        User.getUpdateUsers(function (items) {
+            async.mapLimit(items,1,function(item,callback){
+                Forum.getByUsername(item.username,function (forums) {
+                    async.mapLimit(forums,1,function (forum,cb) {
+                        forum.avator = item.avator;
+                        forum.avatorPath = item.avatorPath;
+                        forum.add(function (err) {
+                            cb(null,forum);
+                        });
+                    },function (err,forumResults) {
+                        callback(null,forumResults);
+                    });
+                })
+            },function(err,results){
+                console.log("==========update User Avator end =======");
+            });
+        });
+    },
+    updateCommentUserAvator:function () {
+        User.getUpdateUsers(function (items) {
+            async.mapLimit(items,1,function(item,callback){
+                Comment.getCommentsByUsername(item.username,function (comments) {
+                    async.mapLimit(comments,1,function (comment,cb) {
+                        comment.avator = item.avator;
+                        comment.avatorPath = item.avatorPath;
+                        comment.add(function (err) {
+                            cb(null,comment);
+                        });
+                    },function (err,commentResults) {
+                        callback(null,commentResults);
+                    });
+                })
+            },function(err,results){
+                console.log("==========update Comment User Avator end =======");
+            });
+        });
+    },
+    updateNewsUserAvator:function () {
+        User.getUpdateUsers(function (items) {
+            async.mapLimit(items,1,function(item,callback){
+                News.getNewsByUserName(item.username,function (newses) {
+                    async.mapLimit(newses,1,function (news,cb) {
+                        news.avator = item.avator;
+                        news.avatorPath = item.avatorPath;
+                        news.add(function (err) {
+                            cb(null,news);
+                        });
+                    },function (err,newsResults) {
+                        callback(null,newsResults);
+                    });
+                })
+            },function(err,results){
+                console.log("==========update News User Avator end =======");
             });
         });
     }

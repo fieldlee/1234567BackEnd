@@ -77,4 +77,10 @@ UserSchma.statics.getAll = function (cb) {
 UserSchma.statics.getItemsByConditions = function (conditions,cb) {
     this.find(conditions).then(cb);
 };
+UserSchma.statics.getUpdateUsers = function (cb) {
+    var nowTime = (new Date()).getTime();
+    var yesterdayTime = nowTime - (60*60*24*1000);
+    var yesterdayDate = new Date(yesterdayTime);
+    this.find({'updateTime':{$gt:yesterdayDate}}).then(cb);
+};
 module.exports = db.model('user', UserSchma);

@@ -51,6 +51,10 @@ NewsSchma.statics.getAll = function (cb) {
     this.find({}).then(cb);
 };
 
+NewsSchma.statics.getNewsByUserName = function (username,cb) {
+    this.find({'author':username}).then(cb);
+};
+
 NewsSchma.statics.getItemsByConditions = function (conditions,cb) {
     this.find(conditions).then(cb);
 };

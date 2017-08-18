@@ -17,14 +17,6 @@ var ffmpeg = require('fluent-ffmpeg');
 var uuid = require('node-uuid');
 var async = require('async');
 /* GET users listing. */
-// req.params.type
-
-
-
-// /usr/local/Cellar/ffmpeg
-// ffmpeg.setFfmpegPath("/usr/local/Cellar/ffmpeg");
-// /Users/depengli/1234567backend/instrumentBackend/routes/api/Web/676a711ad00f90d74a3c169f08b9034e0e22a27c.mp4
-
 
 
 router.use('/sub', require('./subForum/subForum'));
@@ -33,9 +25,7 @@ router.get('/', function(req, res) {
     Forum.getAll(function (results) {
         var handleResults = new Array();
         for (var i = 0, len = results.length; i < len; i++) {
-
             results[i].fromTime = config.preTime(results[i].issueTime);
-
             handleResults.push(results[i]);
         }
 
@@ -55,7 +45,7 @@ router.get('/', function(req, res) {
 
 
 router.get('/:type/:page', function(req, res) {
-    var pageSize = 10;
+    var pageSize = 20;
     var page = new Number(req.params.page);
     if (req.params.type){
         async.series({
@@ -73,7 +63,6 @@ router.get('/:type/:page', function(req, res) {
             },
             two: function(callback){
                 Forum.getTypes(req.params.type,function (results) {
-
                     var handleResults = new Array();
                     var len = 0;
                     if (results.length>=page*pageSize){
@@ -82,9 +71,6 @@ router.get('/:type/:page', function(req, res) {
                         len = results.length;
                     }
                     if((page-1)*pageSize >= results.length){
-                        // var jsonResult = {success:true,page:page,results:[],count:results.length};
-                        // res.json(jsonResult);
-                        // return;
                         callback(null, []);
                     }
                     for (var i = (page-1)*pageSize; i < len; i++) {
@@ -107,7 +93,7 @@ router.get('/:type/:page', function(req, res) {
         },function (err,Results) {
 
             var returnResults = Results.one.concat(Results.two);
-            console.log(returnResults);
+
             var jsonResult = {success:true,page:page,results:returnResults,count:returnResults.length};
             res.json(jsonResult);
             return;
@@ -119,7 +105,7 @@ router.get('/:type/:page', function(req, res) {
 
 router.get('/:type/:subtype/:page', function(req, res) {
     // console.log(req.params.page);
-    var pageSize = 10;
+    var pageSize = 20;
     var page = new Number(req.params.page);
     if (req.params.type && req.params.subtype) {
         async.series({
@@ -171,9 +157,7 @@ router.get('/:type/:subtype/:page', function(req, res) {
                 });
             }
         },function (err,Results) {
-            console.log(Results);
             var returnResults = Results.one.concat(Results.two);
-
             var jsonResult = {success: true, page:page, results: returnResults, count: returnResults.length};
             res.json(jsonResult);
             return;
@@ -188,15 +172,7 @@ router.post('/', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    // console.log(requestJson);
-    // title: String,
-    //     type: String,
-    //     content:String,
-    //     author:String,
-    //     avator:String,
-    //     issueTime:Date,
-    //     images:Array
-    // console.log(requestJson["_id"]);
+
 
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         Forum.getForumById(requestJson["_id"],function (result) {
@@ -211,7 +187,6 @@ router.post('/', function(req, res) {
             result.tags =   requestJson["tags"];
             result.videos =   requestJson["videos"];
             result.images =   requestJson["images"];
-
 
 
             if (result.videos.length>0){

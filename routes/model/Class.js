@@ -20,7 +20,10 @@ var ClassSchma = new mongoose.Schema({
     telphone:String,
     lecture:String,
     lecturename:String,
+    certifyfile:String,
+    certifyfilename:String,
     status:String,
+    materials:{type:Array,default:[]},
     images:{type:Array,default:[]},
     schedules:{type:Array,default:[]},
     joins:{type:Array,default:[]}

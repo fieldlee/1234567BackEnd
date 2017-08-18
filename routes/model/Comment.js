@@ -46,6 +46,10 @@ CommentSchma.statics.getAll = function (callback) {
     this.find({}).then(callback);
 };
 
+CommentSchma.statics.getCommentsByUsername = function (username,callback) {
+    this.find({'author':username}).then(callback);
+};
+
 CommentSchma.statics.getItemsByConditions = function (conditions,callback) {
     this.find(conditions).then(callback);
 };

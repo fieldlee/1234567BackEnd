@@ -102,6 +102,7 @@ router.post('/',function(req,res){
         filename: function (req, file, callback) {
             originName = file.originalname;
             var fileExtension = "";
+            console.log(file.mimetype);
             if (file.mimetype) {
                 if (file.mimetype == 'image/jpeg' ){
                     fileExtension = ".jpg"
@@ -121,9 +122,10 @@ router.post('/',function(req,res){
                 if (file.mimetype == 'image/x-png' ){
                     fileExtension = ".png"
                 }
-                if (file.mimetype == 'image/svg+xml' ){
-                    fileExtension = ".svg"
+                if (file.mimetype == 'audio/mpeg' ){
+                    fileExtension = ".mp3"
                 }
+
             }
             fileName = uuid.v4()+fileExtension;
             callback(null, fileName);

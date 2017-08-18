@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Class = require('../../model/Class');
-
+var User = require('../../model/User');
 /* GET users listing. */
 // req.params.type
 router.get('/', function(req, res) {
@@ -26,9 +26,50 @@ router.post('/join',function(req, res){
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
+    console.log(body);
+    // { "classid":this.class._id,"joinTel":this.joinTel,"joinUsername":window.localStorage.getItem("username"),"joinPayStatus":this.joinPayStatus}
+    if (requestJson["classid"] != null && requestJson["classid"] != "" && requestJson["classid"] != undefined){
+        Class.getClassByID(requestJson["classid"],function (result) {
+            User.getUserByUserName(requestJson["joinUsername"],function (item) {
+                var joinBody = {
+                    "joinTel":requestJson["joinTel"],
+                    "joinUsername":requestJson["joinUsername"],
+                    "joinPayStatus":requestJson["joinPayStatus"],
+                    "joinAvator":item.avator,
+                    "joinAvatorPath":item.avatorPath
+                };
+                if(result.joins){
+                    result.joins = [];
+
+                    result.joins.push(joinBody);
+                }else{
+                    result.joins.push(joinBody);
+                }
+                result.add(function (err) {
+                    var jsonResult = {"success": true,"message":"课程已经关闭"};
+                    res.json(jsonResult);
+                    return;
+                })
+            });
+
+        });
+    }
+});
+
+router.post('/close',function(req, res){
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         Class.getClassByID(requestJson["_id"],function (result) {
-
+            result.status = "close";
+            result.add(function (err) {
+                var jsonResult = {"success": true,"message":"课程已经关闭"};
+                res.json(jsonResult);
+                return;
+            });
         });
     }
 });
@@ -61,7 +102,10 @@ router.post('/', function(req, res) {
             result.telphone =   requestJson["telphone"];
             result.lecture =   requestJson["lecture"];//lecturename
             result.lecturename =   requestJson["lecturename"];
+            result.certifyfile =   requestJson["certifyfile"];
+            result.certifyfilename =   requestJson["certifyfilename"];
             result.status =   requestJson["status"];
+            result.materials =   requestJson["materials"];
             result.images =   requestJson["images"];
             result.content =   requestJson["content"];
             result.schedules =   requestJson["schedules"];
@@ -85,10 +129,13 @@ router.post('/', function(req, res) {
         classinfo.telphone =   requestJson["telphone"];
         classinfo.lecture =   requestJson["lecture"];
         classinfo.lecturename =   requestJson["lecturename"];
+        classinfo.certifyfile =   requestJson["certifyfile"];
+        classinfo.certifyfilename =   requestJson["certifyfilename"];
         classinfo.status =   requestJson["status"];
         classinfo.author =   requestJson["author"];
         classinfo.content =   requestJson["content"];
         classinfo.images =   requestJson["images"];
+        classinfo.materials =   requestJson["materials"];
         classinfo.schedules =   requestJson["schedules"];
         classinfo.add(function (err) {
             console.log(err);
