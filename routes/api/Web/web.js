@@ -42,5 +42,8 @@ router.use('/collect', require('./collect'));
 router.use('/search', require('./search'));
 router.use('/class', require('./class'));
 router.use('/score', require('./score'));
+router.use('/scorecomment', require('./scorecomment'));
+router.use('/classcomment', require('./classcomment'));
+router.use('/show', require('./show'));
 //exports
 module.exports = router;

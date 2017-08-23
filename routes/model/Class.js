@@ -26,7 +26,11 @@ var ClassSchma = new mongoose.Schema({
     materials:{type:Array,default:[]},
     images:{type:Array,default:[]},
     schedules:{type:Array,default:[]},
-    joins:{type:Array,default:[]}
+    joins:{type:Array,default:[]},
+    issueTime:Date,
+    comment:{type:Number,default:0},
+    read:{type:Number,default:0},
+    support:{type:Number,default:0}
 });
 
 ClassSchma.methods.add = function (callback) {

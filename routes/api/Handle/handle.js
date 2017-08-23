@@ -9,6 +9,9 @@ var Product = require('../../model/Product');
 var ConfigPraise = require('../../model/ConfigPraise');
 var Praise = require('../../model/Praise');
 var Comment = require('../../model/Comment');
+var Tag = require('../../model/Tag');
+var Handle = require('../../model/Handle');
+
 var async = require('async');
 var uuid = require('node-uuid');
 var http = require('http'),
@@ -142,60 +145,192 @@ module.exports = {
     },
 
     updateUserAvator:function () {
-        User.getUpdateUsers(function (items) {
-            async.mapLimit(items,1,function(item,callback){
-                Forum.getByUsername(item.username,function (forums) {
-                    async.mapLimit(forums,1,function (forum,cb) {
-                        forum.avator = item.avator;
-                        forum.avatorPath = item.avatorPath;
-                        forum.add(function (err) {
-                            cb(null,forum);
-                        });
-                    },function (err,forumResults) {
-                        callback(null,forumResults);
+        async.series({
+                one: function(callback) {
+                    Handle.getHandleByName("userAvator",function (item) {
+                        callback(null,item);
                     });
-                })
-            },function(err,results){
-                console.log("==========update User Avator end =======");
+                }
+            }, function(err, results) {
+                if(err == null){
+                    var lastTime = new Date("1900-01-01");
+                    if (results.one == null){
+                        var handle = new Handle();
+                        handle.name = "userAvator";
+                        handle.time = new Date();
+                        handle.add();
+                    }else{
+                        lastTime = results.one.time;
+                        results.one.time = new Date();
+                        results.one.add();
+                    }
+                    User.getUpdateUsers(lastTime,function (items) {
+                        async.mapLimit(items,1,function(item,callback){
+                            Forum.getByUsername(item.username,function (forums) {
+                                async.mapLimit(forums,1,function (forum,cb) {
+                                    forum.avator = item.avator;
+                                    forum.avatorPath = item.avatorPath;
+                                    forum.add(function (err) {
+                                        cb(null,forum);
+                                    });
+                                },function (err,forumResults) {
+                                    callback(null,forumResults);
+                                });
+                            })
+                        },function(err,results){
+                            console.log("==========update User Avator end =======");
+                        });
+                    });
+                }
             });
-        });
     },
+
     updateCommentUserAvator:function () {
-        User.getUpdateUsers(function (items) {
-            async.mapLimit(items,1,function(item,callback){
-                Comment.getCommentsByUsername(item.username,function (comments) {
-                    async.mapLimit(comments,1,function (comment,cb) {
-                        comment.avator = item.avator;
-                        comment.avatorPath = item.avatorPath;
-                        comment.add(function (err) {
-                            cb(null,comment);
-                        });
-                    },function (err,commentResults) {
-                        callback(null,commentResults);
+        async.series({
+                one: function(callback) {
+                    Handle.getHandleByName("userCommentAvator",function (item) {
+                        callback(null,item);
                     });
-                })
-            },function(err,results){
-                console.log("==========update Comment User Avator end =======");
+                }
+            }, function(err, results) {
+                if(err == null){
+                    var lastTime = new Date("1900-01-01");
+                    if (results.one == null){
+                        var handle = new Handle();
+                        handle.name = "userCommentAvator";
+                        handle.time = new Date();
+                        handle.add();
+                    }else{
+                        lastTime = results.one.time;
+                        results.one.time = new Date();
+                        results.one.add();
+                    }
+                    User.getUpdateUsers(lastTime,function (items) {
+                        async.mapLimit(items,1,function(item,callback){
+                            Comment.getCommentsByUsername(item.username,function (comments) {
+                                async.mapLimit(comments,1,function (comment,cb) {
+                                    comment.avator = item.avator;
+                                    comment.avatorPath = item.avatorPath;
+                                    comment.add(function (err) {
+                                        cb(null,comment);
+                                    });
+                                },function (err,commentResults) {
+                                    callback(null,commentResults);
+                                });
+                            })
+                        },function(err,results){
+                            console.log("==========update Comment User Avator end =======");
+                        });
+                    });
+                }
             });
-        });
+
+
     },
+
     updateNewsUserAvator:function () {
-        User.getUpdateUsers(function (items) {
-            async.mapLimit(items,1,function(item,callback){
-                News.getNewsByUserName(item.username,function (newses) {
-                    async.mapLimit(newses,1,function (news,cb) {
-                        news.avator = item.avator;
-                        news.avatorPath = item.avatorPath;
-                        news.add(function (err) {
-                            cb(null,news);
-                        });
-                    },function (err,newsResults) {
-                        callback(null,newsResults);
+
+        async.series({
+            one: function(callback) {
+                Handle.getHandleByName("userNewsAvator",function (item) {
+                    callback(null,item);
+                });
+            }
+        }, function(err, results) {
+            // results is now equal to: {one: 1, two: 2}
+            if(err == null){
+                var lastTime = new Date("1900-01-01");
+                if (results.one == null){
+                    var handle = new Handle();
+                    handle.name = "userNewsAvator";
+                    handle.time = new Date();
+                    handle.add();
+                }else{
+                    lastTime = results.one.time;
+                    results.one.time = new Date();
+                    results.one.add();
+                }
+                User.getUpdateUsers(lastTime,function (items) {
+                    async.mapLimit(items,1,function(item,callback){
+                        News.getNewsByUserName(item.username,function (newses) {
+                            async.mapLimit(newses,1,function (news,cb) {
+                                news.avator = item.avator;
+                                news.avatorPath = item.avatorPath;
+                                news.add(function (err) {
+                                    cb(null,news);
+                                });
+                            },function (err,newsResults) {
+                                callback(null,newsResults);
+                            });
+                        })
+                    },function(err,results){
+                        console.log("==========update News User Avator end =======");
                     });
-                })
-            },function(err,results){
-                console.log("==========update News User Avator end =======");
-            });
+                });
+            }
+
         });
+
+
+    },
+
+    tags:function () {
+        Handle.getHandleByName("tags",function (item) {
+            if(item==null){
+                var handle = new Handle();
+                handle.name = "tags";
+                handle.time = new Date();
+                handle.add();
+
+                Forum.getAll(function (forms) {
+                    async.mapLimit(forms,1,function (forum,callback) {
+                        for(var i =0;i<forum.tags.length;i++){
+                            Tag.getTagForNameTypeAndSub(forum.tags[i],forum.type,forum.subType,function (tags) {
+                                if (tags != null){
+                                    tags.number = tags.number + 1;
+                                    tags.add();
+                                }else{
+                                    var tag = new Tag();
+                                    tag.name = forum.tags[i];
+                                    tag.type = forum.type;
+                                    tag.subType = forum.subType;
+                                    tag.number = 1;
+                                    tag.add();
+                                }
+                            });
+                        }
+                        callback(null,forum);
+                    },function (err,results) {
+
+                    })
+                })
+            }else{
+            //    获得更新信息
+                Forum.getForumsByIssue(item.time,function (forums) {
+                    async.mapLimit(forums,1,function (forum,callback) {
+                        for(var i =0;i<forum.tags.length;i++){
+                            Tag.getTagForNameTypeAndSub(forum.tags[i],forum.type,forum.subType,function (tags) {
+                                if (tags != null){
+                                    tags.number = tags.number + 1;
+                                    tags.add();
+                                }else{
+                                    var tag = new Tag();
+                                    tag.name = forum.tags[i];
+                                    tag.type = forum.type;
+                                    tag.subType = forum.subType;
+                                    tag.number = 1;
+                                    tag.add();
+                                }
+                            });
+                        }
+                        callback(null,forum);
+                    },function (err,results) {
+
+                    })
+                });
+                item.time = new Date(); //更新时间
+                item.add();
+            }
+        })
     }
 };

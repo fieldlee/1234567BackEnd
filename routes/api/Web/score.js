@@ -34,7 +34,7 @@ router.get('/id/:id',function (req,res) {
         result.add(function (err) {  // 记录查看次数加1
 
         });
-
+        result.fromTime = config.preTime(result.issueTime);
         var jsonResult = {success:true,data:result};
         res.json(jsonResult);
         return;
@@ -60,7 +60,7 @@ router.get('/:page', function(req, res) {
             return;
         }
         for (var i = (page-1)*pageSize; i < len; i++) {
-            // results[i].fromTime = config.preTime(results[i].issueTime);
+            results[i].fromTime = config.preTime(results[i].issueTime);
             handleResults.push(results[i]);
         }
         var sortedResults = handleResults.sort(function (o, t) {
@@ -77,6 +77,46 @@ router.get('/:page', function(req, res) {
         return;
     });
 });
+
+router.get('/type/:type/:page', function(req, res) {
+    // var page = req.params["page"];
+    var type = req.params.type;
+    var page = new Number(req.params.page);
+    var pageSize = 20;
+
+    Score.getScoresByType(type,function (results) {
+        console.log(results);
+        var handleResults = new Array();
+        var len = 0 ;
+        if (results.length >= page*pageSize){
+            len = page*pageSize;
+        }else{
+            len = results.length;
+        }
+        if((page-1)*pageSize >= results.length){
+            var jsonResult = {success:true,page:page,results:[],count:results.length};
+            res.json(jsonResult);
+            return;
+        }
+        for (var i = (page-1)*pageSize; i < len; i++) {
+            results[i].fromTime = config.preTime(results[i].issueTime);
+            handleResults.push(results[i]);
+        }
+        var sortedResults = handleResults.sort(function (o, t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        var jsonResult = {success: true, page:page, results: sortedResults, count: results.length};
+        res.json(jsonResult);
+        return;
+    });
+});
+
 
 router.post('/', function(req, res) {
     var body = req.body;
@@ -137,6 +177,30 @@ router.post('/', function(req, res) {
 
     }
 
+});
+
+router.get('/support/:id',function (req, res) {
+    if (req.params.id){
+        Score.getScoreById(req.params.id,function (result) {
+            if(result.support){
+                result.support = result.support + 1;
+            }
+            else{
+                result.support =  1;
+            }
+            result.add(function (err) {  // 记录查看次数加1
+
+            });
+
+            var jsonResult = {"success":true,"message":"成功收到您的点赞"};
+            res.json(jsonResult);
+            return;
+        });
+    }else{
+        var jsonResult = {"success":false,"message":"没有收到您的赞，请重试"};
+        res.json(jsonResult);
+        return;
+    }
 });
 
 

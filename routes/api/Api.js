@@ -43,6 +43,14 @@ schdule.scheduleJob(rule, function(){
     handle.downloadForumImages();
     console.log("下载拷贝过来的图片=====end");
 
+    console.log("tag=====start");
+    handle.tags();
+    console.log("tag=====end");
+
+    handle.updateUserAvator(); // 更新用户的头像
+    handle.updateNewsUserAvator(); //更新新闻用户的头像
+    handle.updateCommentUserAvator(); //更新回复用户户的头像
+
     console.log("执行任务===end");
 });
 

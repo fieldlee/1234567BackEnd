@@ -12,9 +12,33 @@ router.get('/', function(req, res) {
     });
 });
 
+router.get('/support/:id',function (req, res) {
+    if (req.params.id){
+        Class.getClassByID(req.params.id,function (result) {
+            if(result.support){
+                result.support = result.support+1;
+            }else{
+                result.support = 1;
+            }
+            result.add(function (err) {
+                var jsonResult = {"success":true,"message":"成功收到您的点赞"};
+                res.json(jsonResult)
+            });
+        });
+    }
+});
+
 router.get('/:id', function(req, res) {
     Class.getClassByID(req.params.id,function (result) {
+        if(result.read){
+            result.read = result.read+1;
+        }else{
+            result.read = 1;
+        }
+        result.add();
+
         var jsonResult = {"success":true,"data":result};
+
         res.json(jsonResult);
     });
 

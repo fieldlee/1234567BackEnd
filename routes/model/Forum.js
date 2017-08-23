@@ -104,6 +104,10 @@ ForumSchma.statics.getAll = function (callback) {
     this.find({}).then(callback);
 };
 
+ForumSchma.statics.getForumsByIssue = function (issueTime,callback) {
+    this.find({"issueTime":{$gte:issueTime}}).then(callback);
+};
+
 ForumSchma.statics.getByUsername = function (username,callback) {
     this.find({"author":username}).sort({"issueTime":-1}).then(callback);
 };

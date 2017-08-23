@@ -27,6 +27,8 @@ var ScoreSchma = new mongoose.Schema({
     avatorPath:String,
     style:String,
     issueTime:Date,
+    fromTime:String,
+    comment:{type:Number,default:0},
     read:{type:Number,default:0},
     support:{type:Number,default:0}
 });
@@ -45,6 +47,10 @@ ScoreSchma.statics.deleteScoreById = function (id,cb) {
 
 ScoreSchma.statics.getAll = function (cb) {
     this.find({}).then(cb);
+};
+
+ScoreSchma.statics.getScoresByType = function (type,cb) {
+    this.find({'type':type}).sort({"issueTime":-1}).then(cb);
 };
 
 ScoreSchma.statics.getScoresByUserName = function (username,cb) {
