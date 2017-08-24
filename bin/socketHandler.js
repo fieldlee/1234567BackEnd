@@ -6,7 +6,7 @@ module.exports = function(io, streams) {
         Show.getShowById(mainid,function (item) {
             item.status = "直播中";
             item.mainid = clientid;
-            item.add();
+            item.save();
         });
     }
 
@@ -16,7 +16,9 @@ module.exports = function(io, streams) {
                 var members = item.members;
                 members.push(clientid);
                 item.members  = members;
-                item.add();
+                item.add(function (err) {
+                    console.log(err);
+                });
             }
         });
     }
@@ -27,7 +29,7 @@ module.exports = function(io, streams) {
                 item.status = "直播结束";
                 item.mainid = "";
                 item.members = [];
-                item.add();
+                item.save()
             }
         });
     }
@@ -37,7 +39,7 @@ module.exports = function(io, streams) {
                 items[i].members = items[i].members.filter(function (t) {
                     return t != audieId
                 });
-                items[i].add();
+                items[i].save()
             }
         });
     }
@@ -49,12 +51,21 @@ module.exports = function(io, streams) {
         client.emit('id', client.id);
 
         client.on('message', function (details) {
-            console.log(details);
+            // console.log(details);
             var otherClient = io.sockets.connected[details.to];
 
             // if(details.type == "init"){ //如果是直播表扬 初始化
             //     audienceJoin(details.to,client.id);//观众 加入
             // }
+
+            if (details.type == "message"){
+                if (details.room){
+                    delete details.to;
+                    details.from = client.id;
+                    client.broadcast.to(details.room).emit('message',details); //广播消息
+                    return;
+                }
+            }
 
             if (!otherClient) {
                 return;
@@ -69,6 +80,8 @@ module.exports = function(io, streams) {
             // if(options.type == "show"){ //如果是直播表扬
             //     openShow(options.id,client.id);//开播
             // }
+            console.log("room:"+options.id);
+            client.join(options.id); //加入room
             //发送 数据参数， 可以修改数据的状态
             streams.addStream(client.id, options.name);
         });
@@ -89,16 +102,23 @@ module.exports = function(io, streams) {
         function leave(options) {
             // console.log(options);
             console.log('-- ' + client.id + ' left --');
-
+            if(options.id != undefined){
+                console.log('-- ' + options.id + ' left --');
+                client.leave(options.id);//离开room
+            }
             mainLeave(client.id);//主播离场
-
             audienceLeave(client.id);//观众离场
-
             streams.removeStream(client.id);
         }
 
         client.on('disconnect', leave);
         client.on('leave', leave);
 
+        client.on('subscribe', function(data) {
+            client.join(data.room);
+        });
+        client.on('unsubscribe', function(data) {
+            client.leave(data.room);
+        });
     });
 };

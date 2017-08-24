@@ -207,6 +207,7 @@ router.post('/support',function (req,res) {
                 console.log(err);
                 var jsonResult = {"success":true,"message":"成功收到您的赞"};
                 res.json(jsonResult);
+                return;
             });
         });
     }

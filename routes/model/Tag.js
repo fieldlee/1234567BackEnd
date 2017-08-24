@@ -19,19 +19,19 @@ TagSchma.methods.add = function (callback) {
     this.save().then(callback);
 };
 
-TagSchma.methods.getAll = function (callback) {
+TagSchma.statics.getAll = function (callback) {
     this.find({}).sort({"number":-1}).then(callback);
 };
 
-TagSchma.methods.getTagForType = function (type,callback) {
+TagSchma.statics.getTagForType = function (type,callback) {
     this.find({"type":type}).sort({"number":-1}).then(callback);
 };
 
-TagSchma.methods.getTagForTypeAndSub = function (type,subtype,callback) {
+TagSchma.statics.getTagForTypeAndSub = function (type,subtype,callback) {
     this.find({"type":type,"subType":subtype}).sort({"number":-1}).then(callback);
 };
 
-TagSchma.methods.getTagForNameTypeAndSub = function (name,type,subtype,callback) {
+TagSchma.statics.getTagForNameTypeAndSub = function (name,type,subtype,callback) {
     this.findOne({"name":name,"type":type,"subType":subtype}).then(callback);
 };
 

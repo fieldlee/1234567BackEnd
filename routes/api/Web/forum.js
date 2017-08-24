@@ -43,7 +43,6 @@ router.get('/', function(req, res) {
     });
 });
 
-
 router.get('/:type/:page', function(req, res) {
     var pageSize = 20;
     var page = new Number(req.params.page);
@@ -63,6 +62,76 @@ router.get('/:type/:page', function(req, res) {
             },
             two: function(callback){
                 Forum.getTypes(req.params.type,function (results) {
+                    var handleResults = new Array();
+                    var len = 0;
+                    if (results.length>=page*pageSize){
+                        len = page*pageSize;
+                    }else{
+                        len = results.length;
+                    }
+                    if((page-1)*pageSize >= results.length){
+                        callback(null, []);
+                    }
+                    for (var i = (page-1)*pageSize; i < len; i++) {
+                        results[i].fromTime = config.preTime(results[i].issueTime);
+                        // config.getImageUrls(results[i].content);
+                        handleResults.push(results[i]);
+                    }
+                    var sortedResults = handleResults.sort(function (o,t) {
+                        var oT = new Date(o.issueTime);
+                        var tT = new Date(t.issueTime);
+                        if (oT > tT){
+                            return -1;
+                        }else{
+                            return 1;
+                        }
+                    });
+                    console.log(sortedResults);
+                    callback(null,sortedResults);
+                });
+            }
+        },function (err,Results) {
+
+            var returnResults = Results.one.concat(Results.two);
+            var jsonResult = {success:true,page:page,results:returnResults,count:returnResults.length};
+            res.json(jsonResult);
+            return;
+        });
+
+    }
+
+});
+
+router.post('/:type/:page', function(req, res) {
+    var pageSize = 20;
+    var page = new Number(req.params.page);
+
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+
+    var searchString = requestJson["search"];
+
+    if (req.params.type){
+
+
+        async.series({
+            one: function(callback){
+                if (page<=1){
+                    Forum.getTopSearchType(req.params.type,searchString,function (results) {
+                        for(var i =0 ;i<results.length;i++){
+                            results[i].fromTime = config.preTime(results[i].issueTime);
+                        }
+                        callback(null,results);
+                    });
+                }else {
+                    callback(null, []);
+                }
+            },
+            two: function(callback){
+                Forum.searchForumsByType(req.params.type,searchString,function (results) {
                     var handleResults = new Array();
                     var len = 0;
                     if (results.length>=page*pageSize){
@@ -165,6 +234,76 @@ router.get('/:type/:subtype/:page', function(req, res) {
     }
 });
 
+router.post('/:type/:subtype/:page', function(req, res) {
+    // console.log(req.params.page);
+    var pageSize = 20;
+    var page = new Number(req.params.page);
+
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+
+    var searchString = requestJson["search"];
+
+    if (req.params.type && req.params.subtype) {
+        async.series({
+            one: function(callback){
+                if (page<=1){
+                    Forum.getTopSearchTypeAndSubType(req.params.type,req.params.subtype,searchString,function (results) {
+                        for (var i = 0; i < results.length; i++) {
+                            results[i].fromTime = config.preTime(results[i].issueTime);
+                        }
+                        callback(null,results);
+                    });
+                }else{
+                    callback(null,[]);
+                }
+
+            },
+            two: function(callback) {
+                Forum.searchForumsByTypeAndSubType(req.params.type,req.params.subtype,searchString,function (results) {
+
+                    var handleResults = new Array();
+
+                    var len = 0 ;
+                    if (results.length>=page*pageSize){
+                        len = page*pageSize;
+                    }else{
+                        len = results.length;
+                    }
+                    // 没有数据
+                    if((page-1)*pageSize >= results.length){
+                        // var jsonResult = {success:true,page:page,results:[],count:results.length};
+                        // res.json(jsonResult);
+                        // return;
+                        callback(null,[]);
+                    }
+                    for (var i = (page-1)*pageSize; i < len; i++) {
+                        results[i].fromTime = config.preTime(results[i].issueTime);
+                        handleResults.push(results[i]);
+                    }
+                    var sortedResults = handleResults.sort(function (o, t) {
+                        var oT = new Date(o.issueTime);
+                        var tT = new Date(t.issueTime);
+                        if (oT > tT) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    });
+                    callback(null,sortedResults);
+                });
+            }
+        },function (err,Results) {
+            var returnResults = Results.one.concat(Results.two);
+            var jsonResult = {success: true, page:page, results: returnResults, count: returnResults.length};
+            res.json(jsonResult);
+            return;
+        });
+    }
+});
 
 router.post('/', function(req, res) {
     var body = req.body;
@@ -197,8 +336,9 @@ router.post('/', function(req, res) {
                 images.push(fullfilename);
                 result.images = images;
                 //get thumbnail image
-                ffmpeg(config.getPath(result.videos[0]))
-                    .on('filenames', function(filenames) {
+                var ffmpeg = ffmpeg(config.getPath(result.videos[0]));
+
+                ffmpeg.on('filenames', function(filenames) {
                         console.log('Will generate ' + filenames.join(', '))
                     })
                     .on('end', function() {
@@ -309,4 +449,5 @@ router.post('/delete', function(req, res) {
         })
     }
 });
+
 module.exports = router;

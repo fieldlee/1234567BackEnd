@@ -10,7 +10,7 @@ var ConfigPraise = require('../../model/ConfigPraise');
 var Praise = require('../../model/Praise');
 var Comment = require('../../model/Comment');
 var Tag = require('../../model/Tag');
-var Handle = require('../../model/Handle');
+var Handler = require('../../model/Handler');
 
 var async = require('async');
 var uuid = require('node-uuid');
@@ -147,7 +147,7 @@ module.exports = {
     updateUserAvator:function () {
         async.series({
                 one: function(callback) {
-                    Handle.getHandleByName("userAvator",function (item) {
+                    Handler.getHandleByName("userAvator",function (item) {
                         callback(null,item);
                     });
                 }
@@ -155,14 +155,14 @@ module.exports = {
                 if(err == null){
                     var lastTime = new Date("1900-01-01");
                     if (results.one == null){
-                        var handle = new Handle();
+                        var handle = new Handler();
                         handle.name = "userAvator";
                         handle.time = new Date();
-                        handle.add();
+                        handle.save();
                     }else{
                         lastTime = results.one.time;
                         results.one.time = new Date();
-                        results.one.add();
+                        results.one.save();
                     }
                     User.getUpdateUsers(lastTime,function (items) {
                         async.mapLimit(items,1,function(item,callback){
@@ -188,7 +188,7 @@ module.exports = {
     updateCommentUserAvator:function () {
         async.series({
                 one: function(callback) {
-                    Handle.getHandleByName("userCommentAvator",function (item) {
+                    Handler.getHandleByName("userCommentAvator",function (item) {
                         callback(null,item);
                     });
                 }
@@ -196,14 +196,14 @@ module.exports = {
                 if(err == null){
                     var lastTime = new Date("1900-01-01");
                     if (results.one == null){
-                        var handle = new Handle();
+                        var handle = new Handler();
                         handle.name = "userCommentAvator";
                         handle.time = new Date();
-                        handle.add();
+                        handle.save();
                     }else{
                         lastTime = results.one.time;
                         results.one.time = new Date();
-                        results.one.add();
+                        results.one.save();
                     }
                     User.getUpdateUsers(lastTime,function (items) {
                         async.mapLimit(items,1,function(item,callback){
@@ -232,7 +232,7 @@ module.exports = {
 
         async.series({
             one: function(callback) {
-                Handle.getHandleByName("userNewsAvator",function (item) {
+                Handler.getHandleByName("userNewsAvator",function (item) {
                     callback(null,item);
                 });
             }
@@ -241,14 +241,14 @@ module.exports = {
             if(err == null){
                 var lastTime = new Date("1900-01-01");
                 if (results.one == null){
-                    var handle = new Handle();
+                    var handle = new Handler();
                     handle.name = "userNewsAvator";
                     handle.time = new Date();
-                    handle.add();
+                    handle.save();
                 }else{
                     lastTime = results.one.time;
                     results.one.time = new Date();
-                    results.one.add();
+                    results.one.save();
                 }
                 User.getUpdateUsers(lastTime,function (items) {
                     async.mapLimit(items,1,function(item,callback){
@@ -275,31 +275,39 @@ module.exports = {
     },
 
     tags:function () {
-        Handle.getHandleByName("tags",function (item) {
+        Handler.getHandleByName("tags",function (item) {
             if(item==null){
-                var handle = new Handle();
+                var handle = new Handler();
                 handle.name = "tags";
                 handle.time = new Date();
                 handle.add();
 
                 Forum.getAll(function (forms) {
                     async.mapLimit(forms,1,function (forum,callback) {
-                        for(var i =0;i<forum.tags.length;i++){
-                            Tag.getTagForNameTypeAndSub(forum.tags[i],forum.type,forum.subType,function (tags) {
+                        console.log(forum.tags);
+                        async.mapLimit(forum.tags,1,function (item,itemcallback) {
+                            Tag.getTagForNameTypeAndSub(item,forum.type,forum.subType,function (tags) {
                                 if (tags != null){
                                     tags.number = tags.number + 1;
                                     tags.add();
+                                    itemcallback(null,tags)
                                 }else{
                                     var tag = new Tag();
-                                    tag.name = forum.tags[i];
+                                    tag.name = item;
                                     tag.type = forum.type;
                                     tag.subType = forum.subType;
                                     tag.number = 1;
                                     tag.add();
+                                    itemcallback(null,tag)
                                 }
+
                             });
-                        }
-                        callback(null,forum);
+                        },function (err,items) {
+                            if(items.length == forum.tags.length){
+                                callback(null,forum);
+                            }
+                        });
+
                     },function (err,results) {
 
                     })
@@ -308,22 +316,29 @@ module.exports = {
             //    获得更新信息
                 Forum.getForumsByIssue(item.time,function (forums) {
                     async.mapLimit(forums,1,function (forum,callback) {
-                        for(var i =0;i<forum.tags.length;i++){
-                            Tag.getTagForNameTypeAndSub(forum.tags[i],forum.type,forum.subType,function (tags) {
+                        console.log(forum.tags);
+                        async.mapLimit(forum.tags,1,function (item,itemcallback) {
+                            Tag.getTagForNameTypeAndSub(item,forum.type,forum.subType,function (tags) {
                                 if (tags != null){
                                     tags.number = tags.number + 1;
                                     tags.add();
+                                    itemcallback(null,tags);
                                 }else{
                                     var tag = new Tag();
-                                    tag.name = forum.tags[i];
+                                    tag.name = item;
                                     tag.type = forum.type;
                                     tag.subType = forum.subType;
                                     tag.number = 1;
                                     tag.add();
+                                    itemcallback(null,tag);
                                 }
                             });
-                        }
-                        callback(null,forum);
+                        },function (err,items) {
+                            if(items.length == forum.tags.length){
+                                callback(null,forum);
+                            }
+                        });
+
                     },function (err,results) {
 
                     })

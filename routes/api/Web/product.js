@@ -73,6 +73,7 @@ router.post('/', function(req, res) {
                 console.log(err);
                 var jsonResult = {"success": true,"data":result};
                 res.json(jsonResult);
+                return;
             });
         });
     }else{
@@ -95,6 +96,7 @@ router.post('/', function(req, res) {
             console.log(err);
             var jsonResult = {"success": true,"data":result};
             res.json(jsonResult);
+            return;
         })
     }
 
@@ -112,9 +114,11 @@ router.post('/delete', function(req, res) {
             if (result.result.ok == 1){
                 var jsonResult = {"success": true};
                 res.json(jsonResult);
+                return;
             }
             var jsonResult = {"success": false};
             res.json(jsonResult);
+            return;
         })
     }
 });

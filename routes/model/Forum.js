@@ -47,6 +47,10 @@ ForumSchma.statics.getRecentForums = function (callback) {
     this.find({}).sort({"issueTime":-1}).limit(15).then(callback);
 };
 
+ForumSchma.statics.getHotForums = function (callback) {
+    this.find({}).sort({"read":-1}).limit(15).then(callback);
+};
+
 ForumSchma.statics.getTopSubType = function (type,subtype,callback) {
     if(subtype=="其他"){
         switch (type){
@@ -70,7 +74,6 @@ ForumSchma.statics.getTopSubType = function (type,subtype,callback) {
     }
 
 };
-
 
 ForumSchma.statics.getTypeAndSubType = function (type,subtype,callback) {
     if(subtype=="其他"){
@@ -127,6 +130,70 @@ ForumSchma.statics.deleteForumById = function (id,callback) {
 
 ForumSchma.statics.searchForums = function (key,callback) {
     this.find({ $or: [ {"title":{'$regex': key}}, {"content":{'$regex': key}} ]}).sort({"issueTime":-1}).then(callback);
+};
+
+
+ForumSchma.statics.getTopSearchType = function (type,key,callback) {
+    this.find({"type":type,"topup":true,$or: [ {"title":{'$regex': key}}, {"content":{'$regex': key}} ]}).sort({"issueTime":-1}).then(callback);
+};
+
+ForumSchma.statics.getTopSearchTypeAndSubType = function (type,subtype,key,callback) {
+    var subCondition = subtype;
+    if(subtype=="其他") {
+        switch (type) {
+            case "键盘乐器":
+                subCondition = {$nin: ["钢琴"]};
+
+                break;
+            case "管式乐器":
+                subCondition = {$nin: ["萨克斯"]};
+
+                break;
+            case "拉弦乐器":
+                subCondition = {$nin: ["小提琴", "吉他"]};
+
+                break;
+            case "弹拨乐器":
+                subCondition = {$nin: ["琵琶"]};
+                break;
+            default:
+                subCondition = subtype;
+
+        }
+    }
+
+    this.find({"type":type,"subType":subCondition,"topup":true,$or: [ {"title":{'$regex': key}}, {"content":{'$regex': key}} ]}).sort({"issueTime":-1}).then(callback);
+};
+
+ForumSchma.statics.searchForumsByType = function (type,key,callback) {
+    this.find({"type":type, "topup":{"$ne":true}, $or: [ {"title":{'$regex': key}}, {"content":{'$regex': key}} ]}).sort({"issueTime":-1}).then(callback);
+};
+
+ForumSchma.statics.searchForumsByTypeAndSubType = function (type,subtype,key,callback) {
+    var subCondition = subtype;
+    if(subtype=="其他") {
+        switch (type) {
+            case "键盘乐器":
+                subCondition = {$nin: ["钢琴"]};
+
+                break;
+            case "管式乐器":
+                subCondition = {$nin: ["萨克斯"]};
+
+                break;
+            case "拉弦乐器":
+                subCondition = {$nin: ["小提琴", "吉他"]};
+
+                break;
+            case "弹拨乐器":
+                subCondition = {$nin: ["琵琶"]};
+                break;
+            default:
+                subCondition = subtype;
+
+        }
+    }
+    this.find({"type":type,"subType":subCondition, "topup":{"$ne":true}, $or: [ {"title":{'$regex': key}}, {"content":{'$regex': key}} ]}).sort({"issueTime":-1}).then(callback);
 };
 
 ForumSchma.statics.getItemsByConditions = function (conditions,callback) {

@@ -8,17 +8,19 @@ mongoose.Promise = Promise;
 
 var db = mongoose.createConnection(config.getDatabase());
 
-var HandleSchma = new mongoose.Schema({
+var HandlerSchma = new mongoose.Schema({
     name:String,
+    type:String,
+    subType:String,
     time:{type:Date}
 });
 
-HandleSchma.methods.add = function (callback) {
+HandlerSchma.methods.add = function (callback) {
     this.save().then(callback);
 };
 
-HandleSchma.methods.getHandleByName = function (name,callback) {
+HandlerSchma.statics.getHandleByName = function (name,callback) {
     this.findOne({"name":name}).then(callback);
 };
 
-module.exports = db.model('handle', HandleSchma);
+module.exports = db.model('handler', HandlerSchma);

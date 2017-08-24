@@ -36,6 +36,23 @@ router.get('/recent',function (req,res) {
     });
 });
 
+router.get('/hot',function (req,res) {
+    Forum.getHotForums(function (results) {
+        var sortedResults = results.sort(function (o,t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT){
+                return -1;
+            }else{
+                return 1;
+            }
+        });
+        var jsonResult = {"success":true,"results":sortedResults};
+        res.json(jsonResult);
+        return;
+    });
+});
+
 router.get('/support/:id',function (req, res) {
     if (req.params.id){
         Forum.getForumById(req.params.id,function (result) {
@@ -73,7 +90,6 @@ router.get('/topup/:id',function (req, res) {
         });
     }
 });
-
 
 router.get('/byid/:id',function (req, res) {
     if (req.params.id){

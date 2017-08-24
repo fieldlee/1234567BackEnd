@@ -28,8 +28,8 @@ apiRouter.use('/web', require('./Web/web'));
 
 var rule = new schdule.RecurrenceRule();
 rule.dayOfWeek = [0, new schdule.Range(1, 6)];
-rule.hour = 9;
-rule.minute = 44;
+rule.hour = 11;
+rule.minute = 35;
 schdule.scheduleJob(rule, function(){
     console.log("执行任务==start");
     console.log("计算会员信息====start");
