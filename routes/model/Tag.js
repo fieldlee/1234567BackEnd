@@ -24,11 +24,15 @@ TagSchma.statics.getAll = function (callback) {
 };
 
 TagSchma.statics.getTagForType = function (type,callback) {
-    this.find({"type":type}).sort({"number":-1}).then(callback);
+    this.aggregate({
+        $group : {_id : { type: "$type", name: "$name" }, total : { $sum : "$number" }}
+    }).sort({"total":-1}).then(callback);
 };
 
 TagSchma.statics.getTagForTypeAndSub = function (type,subtype,callback) {
-    this.find({"type":type,"subType":subtype}).sort({"number":-1}).then(callback);
+    this.aggregate({
+        $group : {_id : { type: "$type",subType: "$subType", name: "$name" }, total : { $sum : "$number" }}
+    }).sort({"total":-1}).then(callback);
 };
 
 TagSchma.statics.getTagForNameTypeAndSub = function (name,type,subtype,callback) {
