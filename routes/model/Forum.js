@@ -22,6 +22,7 @@ var ForumSchma = new mongoose.Schema({
     avatorPath:String,
     issueTime:Date,
     fromTime:String,
+    duration:String,
     images:Array,
     videos:Array,
     topup:{type:Boolean,default:false},

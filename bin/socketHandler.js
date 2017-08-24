@@ -29,7 +29,9 @@ module.exports = function(io, streams) {
                 item.status = "直播结束";
                 item.mainid = "";
                 item.members = [];
-                item.save()
+                item.add(function (err) {
+                    console.log(err);
+                })
             }
         });
     }
@@ -39,7 +41,9 @@ module.exports = function(io, streams) {
                 items[i].members = items[i].members.filter(function (t) {
                     return t != audieId
                 });
-                items[i].save()
+                items[i].add(function (err) {
+                    console.log(err);
+                })
             }
         });
     }
