@@ -12,8 +12,14 @@ var Comment = require('../../model/Comment');
 var Tag = require('../../model/Tag');
 var Handler = require('../../model/Handler');
 
+var Youtube = require('../../model/DataModel/Youtube');
+
+var crawler = require('youtube-crawler');
+var crawl = require('youtube-crawl');
+
 var async = require('async');
 var uuid = require('node-uuid');
+var https = require('https');
 var http = require('http'),
     Stream = require('stream').Transform,
     fs = require('fs');
@@ -347,5 +353,34 @@ module.exports = {
                 item.add();
             }
         })
+    },
+
+    crawlerYoutube:function (key) {
+        console.log("=====crawlerYoutube start======");
+        crawler(key, function (results) {
+            console.dir(results);
+            console.log("=====crawlerYoutube end======");
+        });
+    },
+    crawlYoutube:function (key) {
+        console.log("=====crawlYoutube start======");
+        crawl(key)
+            .then(function(results) {
+                console.log("=====crawlYoutube end======");
+                console.log(results);
+            })
+            .catch(function(error) {
+                console.log("=====crawlYoutube catch======");
+                console.error(error);
+            });
+    },
+
+    youtube:function (link) {
+        https.get(link, function(res) {
+            console.log("Got response: " + res.statusCode);
+            console.log(res);
+        }).on('error', function(e) {
+            console.log("Got error: " + e.message);
+        });
     }
 };

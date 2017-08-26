@@ -29,6 +29,8 @@
     "sha1": "^1.1.1",
     "socket.io": "^2.0.3",
     "video-screen": "0.0.1",
-    "video-thumb": "0.0.3"
+    "video-thumb": "0.0.3",
+    "youtube-crawl": "0.0.1",
+    "youtube-crawler": "0.0.3"
   }
 }

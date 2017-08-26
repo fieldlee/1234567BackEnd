@@ -28,8 +28,8 @@ apiRouter.use('/web', require('./Web/web'));
 
 var rule = new schdule.RecurrenceRule();
 rule.dayOfWeek = [0, new schdule.Range(1, 6)];
-rule.hour = 11;
-rule.minute = 35;
+rule.hour = 13;
+rule.minute = 22;
 schdule.scheduleJob(rule, function(){
     console.log("执行任务==start");
     console.log("计算会员信息====start");
@@ -51,7 +51,6 @@ schdule.scheduleJob(rule, function(){
     handle.updateNewsUserAvator(); //更新新闻用户的头像
     handle.updateCommentUserAvator(); //更新回复用户户的头像
 
-    console.log("执行任务===end");
 });
 
 //exports
