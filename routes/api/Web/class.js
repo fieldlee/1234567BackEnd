@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Class = require('../../model/Class');
 var User = require('../../model/User');
+var config = require('../../api/config');
 /* GET users listing. */
 // req.params.type
 router.get('/', function(req, res) {
@@ -94,6 +95,115 @@ router.post('/close',function(req, res){
                 res.json(jsonResult);
                 return;
             });
+        });
+    }
+});
+
+router.post('/update',function(req, res){
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+    // joinid
+    if (requestJson["classid"] != null && requestJson["classid"] != "" && requestJson["classid"] != undefined){
+        Class.getClassByID(requestJson["classid"],function (result) {
+            if(result != null){
+                result.mainid = requestJson["mainid"];
+                result.add(function (err) {
+                    result.idcard = "";
+                    var jsonResult = {"success":true,"data":result};
+                    res.json(jsonResult);
+                    return;
+                });
+            }
+        });
+    }
+});
+
+router.post('/start',function(req, res){
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+    // joinid
+    if (requestJson["classid"] != null && requestJson["classid"] != "" && requestJson["classid"] != undefined){
+        Class.getClassByID(requestJson["classid"],function (result) {
+            if(result != null){
+                result.mainid = requestJson["mainid"];
+                result.status = config.ClassStatus.LIVE;
+                result.add(function (err) {
+                    result.idcard = "";
+                    var jsonResult = {"success":true,"data":result};
+                    res.json(jsonResult);
+                    return;
+                });
+            }
+        });
+    }
+});
+
+router.post('/leave',function(req, res){
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+    // joinid
+    if (requestJson["classid"] != null && requestJson["classid"] != "" && requestJson["classid"] != undefined){
+        Class.getClassByID(requestJson["classid"],function (result) {
+            if(result != null){
+                if (requestJson["type"] =="main"){
+                    result.mainid = "";
+                    result.members = [];
+                    result.status =  config.ClassStatus.OVER;
+                    result.add(function (err) {
+                        result.idcard = "";
+                        var jsonResult = {"success":true,"data":result};
+                        res.json(jsonResult);
+                        return;
+                    });
+                }else{
+                    result.members = result.members.filter(function (t) {
+                        return t != requestJson["memberid"];
+                    });
+                    result.add(function (err) {
+                        result.idcard = "";
+                        var jsonResult = {"success":true,"data":result};
+                        res.json(jsonResult);
+                        return;
+                    });
+                }
+            }
+        });
+    }
+});
+
+router.post('/inclass',function(req, res){
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+    // memberid
+    if (requestJson["classid"] != null && requestJson["classid"] != "" && requestJson["classid"] != undefined){
+        Class.getClassByID(requestJson["classid"],function (result) {
+            if(result != null){
+                if (result.members.indexOf(requestJson["memberid"]) >= 0 ){
+
+                }else{
+                    result.members.push(requestJson["memberid"]);
+                }
+                //保密删除 身份证信息。
+
+                result.add(function (err) {
+                    result.idcard = "";
+                    var jsonResult = {"success":true,"data":result};
+                    res.json(jsonResult);
+                    return;
+                });
+            }
         });
     }
 });

@@ -22,7 +22,11 @@ var ClassSchma = new mongoose.Schema({
     lecturename:String,
     certifyfile:String,
     certifyfilename:String,
+    idcard:String,
+    idno:String,
     status:String,
+    mainid:String,
+    members:{type:Array,default:[]},
     materials:{type:Array,default:[]},
     images:{type:Array,default:[]},
     schedules:{type:Array,default:[]},
@@ -39,6 +43,14 @@ ClassSchma.methods.add = function (callback) {
 
 ClassSchma.statics.getClassByStatus = function (callback) {
     this.find({"status":"1"}).then(callback);
+};
+
+ClassSchma.statics.getClassByMainId = function (mainid,callback) {
+    this.findOne({"mainid":mainid}).then(callback);
+};
+
+ClassSchma.statics.getClassByMember = function (id,callback) {
+    this.find({ "members":{ $in:[id]}}).then(callback);
 };
 
 ClassSchma.statics.getClassByID = function (ID,callback) {

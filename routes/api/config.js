@@ -17,6 +17,18 @@ Date.prototype.yyyymmdd = function() {
 var date = new Date();
 date.yyyymmdd();
 module.exports = {
+    LiveStatus:{
+        PLAN:"预报",
+        LIVE:"直播中",
+        OVER:"直播结束",
+        CLOSE:"关闭"
+    },
+    ClassStatus:{
+        PLAN:"预报",
+        LIVE:"讲课中",
+        OVER:"课堂结束",
+        CLOSE:"关闭"
+    },
     getDatabase: function () {
         return 'mongodb://localhost:27017/instrument?socketTimeoutMS=200000';
     },
