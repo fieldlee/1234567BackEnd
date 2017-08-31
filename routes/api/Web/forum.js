@@ -437,19 +437,19 @@ router.post('/', function(req, res) {
             images.push(fullfilename);
             forum.images = images;
             // 读取视频的图片
-            // ffmpeg(config.getPath(forum.videos[0])).on('filenames', function(filenames) {
-            //     console.log('Will generate ' + filenames.join(', '))
-            //     })
-            //     .on('end', function() {
-            //         console.log('Screenshots taken');
-            //     })
-            //     .screenshots({
-            //         count: 1,
-            //         timestamps: ['00:02.123'],
-            //         filename: filename,
-            //         folder: config.thumbnailPath(),
-            //         size: '200x150'
-            //     });
+            ffmpeg(config.getPath(forum.videos[0])).on('filenames', function(filenames) {
+                console.log('Will generate ' + filenames.join(', '))
+                })
+                .on('end', function() {
+                    console.log('Screenshots taken');
+                })
+                .screenshots({
+                    count: 1,
+                    timestamps: ['00:02.123'],
+                    filename: filename,
+                    folder: config.thumbnailPath(),
+                    size: '200x150'
+                });
             // 读取视频的总时长
             ffmpeg.ffprobe(config.getPath(forum.videos[0]),function (err,meta) {
                 console.log(meta);
