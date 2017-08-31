@@ -452,7 +452,7 @@ router.post('/', function(req, res) {
             //     });
             // 读取视频的总时长
             ffmpeg.ffprobe(config.getPath(forum.videos[0]),function (err,meta) {
-
+                console.log(meta);
                 if (meta.format.duration != undefined){
                     var intduration = parseInt(meta.format.duration);
                     // console.log(intduration);
