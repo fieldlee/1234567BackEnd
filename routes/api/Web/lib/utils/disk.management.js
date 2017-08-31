@@ -52,7 +52,7 @@ function upload(req, fileRoute, options, callback) {
   }
 
   function sendResponse() {
-    callback(null, {link: rootUrl+link});
+    callback(null, {link: link});
   }
 
   // Handle file arrival.

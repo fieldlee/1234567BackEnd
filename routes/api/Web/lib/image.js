@@ -99,8 +99,8 @@ function list(folderPath, thumbPath, callback) {
           errObj = err;
         } else if (stats.isFile() && defaultUploadOptions['validation']['allowedExts'].indexOf(extension) != -1) {
           images.push({
-            url: rootUrl + folderPath + fileName,
-            thumb: rootUrl + thumbPath + fileName,
+            url:  folderPath + fileName,
+            thumb:  thumbPath + fileName,
             tag: fileName
           })
         }

@@ -110,7 +110,7 @@ module.exports = {
         //     return date.yyyymmdd();
     },
     getRootPath:function () {
-      return "http://localhost:3000";
+      return "http://106.14.209.183:3000";
     },
     getPath:function (path) {
         var replacePath = path.replace(this.getRootPath(),"./public");
