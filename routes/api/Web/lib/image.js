@@ -3,7 +3,7 @@ var diskManagement = require('./utils/disk.management.js');
 var utils = require('./utils/utils.js');
 var path = require('path');
 var fs = require('fs');
-var rootUrl = "http://localhost:3000";
+var rootUrl = "http://106.14.209.183:3000";
 
 var defaultUploadOptions = {
   'fieldname': 'file',
@@ -99,8 +99,8 @@ function list(folderPath, thumbPath, callback) {
           errObj = err;
         } else if (stats.isFile() && defaultUploadOptions['validation']['allowedExts'].indexOf(extension) != -1) {
           images.push({
-            url:  folderPath + fileName,
-            thumb:  thumbPath + fileName,
+            url: rootUrl + folderPath + fileName,
+            thumb: rootUrl + thumbPath + fileName,
             tag: fileName
           })
         }

@@ -5,7 +5,7 @@ var path = require('path');
 var fs = require('fs');
 var sha1 = require('sha1');
 var gm = require('gm').subClass({imageMagick: true});
-var rootUrl = "http://localhost:3000";
+var rootUrl = "http://106.14.209.183:3000";
 /**
 * Upload a file to the specified location.
 *
@@ -52,7 +52,7 @@ function upload(req, fileRoute, options, callback) {
   }
 
   function sendResponse() {
-    callback(null, {link: link});
+    callback(null, {link: rootUrl+link});
   }
 
   // Handle file arrival.

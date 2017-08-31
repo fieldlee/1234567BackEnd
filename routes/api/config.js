@@ -113,7 +113,9 @@ module.exports = {
       return "http://106.14.209.183:3000";
     },
     getPath:function (path) {
+        console.log(path);
         var replacePath = path.replace(this.getRootPath(),"./public");
+        console.log(replacePath);
         return replacePath;
     },
     getUrlPath :function (path) {
