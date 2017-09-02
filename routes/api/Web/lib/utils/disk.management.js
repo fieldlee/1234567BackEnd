@@ -5,6 +5,7 @@ var path = require('path');
 var fs = require('fs');
 var sha1 = require('sha1');
 var gm = require('gm').subClass({imageMagick: true});
+
 var rootUrl = "http://106.14.209.183:3000";
 /**
 * Upload a file to the specified location.
