@@ -3,6 +3,7 @@
  */
 'use strict';
 var jwt    = require('jsonwebtoken');
+var path = require('path');
 
 Date.prototype.yyyymmdd = function() {
     var mm = this.getMonth() + 1; // getMonth() is zero-based
@@ -110,7 +111,7 @@ module.exports = {
         //     return date.yyyymmdd();
     },
     getRootPath:function () {
-      return "http://106.14.209.183:3000";
+      return "http://localhost:3000";
     },
     getPath:function (path) {
         console.log(path);
@@ -142,6 +143,9 @@ module.exports = {
     },
     getImagePath:function () {
         return "./public/uploads/images/"+this.getYmPath();
+    },
+    getScorePath:function () {
+        return "./public/uploads/score";
     },
     getImageUrls:function(content){
         var m,urls = [],rex =/<img[^>]+src="(http:\/\/[^">]+)"/g;

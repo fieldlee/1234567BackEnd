@@ -110,11 +110,12 @@ module.exports = function(io, streams) {
 
     io.on('connection', function(client) {
         // console.log(client);
+        console.log(streams);
         console.log('-- ' + client.id + ' joined --');
         client.emit('id', client.id);
 
         client.on('message', function (details) {
-            // console.log(details);
+            console.log(details);
             var otherClient = io.sockets.connected[details.to];
 
             // if(details.type == "init"){ //如果是直播表扬 初始化
@@ -136,6 +137,7 @@ module.exports = function(io, streams) {
             }
             delete details.to;
             details.from = client.id;
+            console.log(details);
             otherClient.emit('message', details);
         });
 
@@ -145,6 +147,7 @@ module.exports = function(io, streams) {
             client.broadcast.emit('readyToStream',{}); //传播ready信息号，刷新列表
 
             //发送 数据参数， 可以修改数据的状态
+            console.log(options);
             streams.addStream(client.id, options.name);
         });
 

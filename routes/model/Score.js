@@ -53,6 +53,29 @@ ScoreSchma.statics.getScoresByType = function (type,cb) {
     this.find({'type':type}).sort({"issueTime":-1}).then(cb);
 };
 
+ScoreSchma.statics.getHotScoresByType = function (type,cb) {
+    this.find({'type':type}).sort({"read":1}).then(cb);
+};
+
+ScoreSchma.statics.getScoresByTypeAndKey = function (type,key,cb) {
+    this.find({'type':type,"title":{'$regex': key}}).sort({"issueTime":-1}).then(cb);
+};
+
+ScoreSchma.statics.getScoresByTypeAndSelect = function (type,lvl,region,style,cb) {
+    var obj = {'type':type};
+    if (lvl){
+        obj.difficult = lvl;
+    }
+    if(region){
+        obj.region = region;
+    }
+    if(style){
+        obj.style = style;
+    }
+    console.log(obj);
+    this.find(obj).sort({"issueTime":-1}).then(cb);
+};
+
 ScoreSchma.statics.getScoresByUserName = function (username,cb) {
     this.find({'author':username}).then(cb);
 };

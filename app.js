@@ -14,7 +14,6 @@ var app        = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 
 
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -24,12 +23,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookie());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-app.use(function(err, req, res, next) {
-    console.log("path:");
-    console.log(req.path);
-    next();
-});
 
 // app.post('/api/web/file',function(req,res){
 //     var fileName = "";
@@ -58,7 +51,6 @@ app.use(function(err, req, res, next) {
 //         res.json({success:true,path:fileName})
 //     });
 // });
-
 
 app.use('/api',apis);
 

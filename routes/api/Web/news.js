@@ -13,13 +13,13 @@ var News = require('../../model/News');
 /* GET users listing. */
 // req.params.type
 router.get('/number',function (req,res) {
+    console.log("=====");
     News.getAll(function (results) {
-       if (results.length>0){
-           var jsonResult = {success:true,"count":results.length};
-           console.log(jsonResult);
+       // if (results.length>0){
+           var jsonResult = {"success":true,"count":results.length.toString()};
+           // console.log(jsonResult);
            res.json(jsonResult);
            return;
-       }
     });
 });
 router.get('/byid/:id',function (req,res) {

@@ -5,8 +5,9 @@ var path = require('path');
 var fs = require('fs');
 var sha1 = require('sha1');
 var gm = require('gm').subClass({imageMagick: true});
+var config = require('../../../config');
 
-var rootUrl = "http://106.14.209.183:3000";
+var rootUrl = config.getRootPath();
 /**
 * Upload a file to the specified location.
 *
@@ -58,8 +59,6 @@ function upload(req, fileRoute, options, callback) {
 
   // Handle file arrival.
   busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-    console.log(file);
-    console.log(filename);
     // Check fieldname:
     if (fieldname != options.fieldname) {
 
@@ -71,15 +70,12 @@ function upload(req, fileRoute, options, callback) {
     // Generate link.
     var randomName = sha1(new Date().getTime()) + '.' + utils.getExtension(filename);
     link = fileRoute + randomName;
-    console.log(require.main.filename);
+    // console.log(require.main.filename);
     var appDir = path.dirname(path.dirname(require.main.filename));
     appDir = path.join(appDir,"public");
-    console.log("appDir:");
-    console.log(appDir);
     // Generate path where the file will be saved.
     saveToPath = path.join(appDir, link);
-      console.log("saveToPath:");
-    console.log(saveToPath);
+
     // Pipe reader stream (file from client) into writer stream (file from disk).
     file.on('error', handleStreamError);
 
@@ -89,25 +85,20 @@ function upload(req, fileRoute, options, callback) {
 
       // Validate uploaded file.
       if (options.validation) {
-
         return utils.isValid(options.validation, saveToPath, mimetype, function(err, status) {
-
           if (err) {
             return handleStreamError(err);
           }
-
           if (!status) {
             return handleStreamError('File does not meet the validation.');
           }
-
           return sendResponse();
         });
       }
       return sendResponse();
-    })
+    });
 
     if (options.resize && mimetype != 'image/svg+xml') {
-
       var gmFile = gm(file);
       var imageResizeStream = gmFile.resize.apply(gmFile, options.resize).stream();
       imageResizeStream.on('error', handleStreamError);
@@ -121,7 +112,6 @@ function upload(req, fileRoute, options, callback) {
   // Handle file upload termination.
   busboy.on('error', handleStreamError);
   req.on('error', handleStreamError);
-
   // Pipe reader stream into writer stream.
   return req.pipe(busboy);
 }
@@ -134,8 +124,8 @@ function upload(req, fileRoute, options, callback) {
 */
 var _delete = function(src, callback) {
     src = src.replace(rootUrl,"");
-    console.log(src);
-    console.log(path.join(path.join(path.dirname(path.dirname(require.main.filename)),"public"), src));
+    // console.log(src);
+    // console.log(path.join(path.join(path.dirname(path.dirname(require.main.filename)),"public"), src));
   fs.unlink(path.join(path.join(path.dirname(path.dirname(require.main.filename)),"public"), src), function (err) {
     if (err) {
       return callback(err);

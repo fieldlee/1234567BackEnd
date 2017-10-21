@@ -362,8 +362,17 @@ router.post('/', function(req, res) {
                         var mins = parseInt((intduration - hours*60*60 )/ 60);
                         var seconds = intduration - (hours * 60*60 + mins*60);
                         if (hours>0){
+                            if (mins<10){
+                                mins = "0"+mins;
+                            }
+                            if(seconds<10){
+                                seconds = "0"+seconds;
+                            }
                             forum.duration = hours+":"+mins+":"+seconds;
                         }else{
+                            if (seconds<10){
+                                seconds = "0"+seconds;
+                            }
                             forum.duration = mins+":"+seconds;
                         }
 
@@ -448,8 +457,17 @@ router.post('/', function(req, res) {
                     var seconds = intduration - (hours * 60*60 + mins*60);
                     // console.log(seconds);
                     if (hours>0){
+                        if (mins<10){
+                            mins = "0"+mins;
+                        }
+                        if(seconds<10){
+                            seconds = "0"+seconds;
+                        }
                         forum.duration = hours+":"+mins+":"+seconds;
                     }else{
+                        if (seconds<10){
+                            seconds = "0"+seconds;
+                        }
                         forum.duration = mins+":"+seconds;
                     }
 

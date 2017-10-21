@@ -46,5 +46,7 @@ router.use('/scorecomment', require('./scorecomment'));
 router.use('/classcomment', require('./classcomment'));
 router.use('/show', require('./show'));
 router.use('/tag', require('./tag'));
+
+router.use('/maintain',require('./maintain/maintain'));
 //exports
 module.exports = router;

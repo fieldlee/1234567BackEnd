@@ -3,7 +3,9 @@ var diskManagement = require('./utils/disk.management.js');
 var utils = require('./utils/utils.js');
 var path = require('path');
 var fs = require('fs');
-var rootUrl = "http://106.14.209.183:3000";
+var config = require('../../config');
+
+var rootUrl = config.getRootPath();
 
 var defaultUploadOptions = {
   'fieldname': 'file',

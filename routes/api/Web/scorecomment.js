@@ -13,6 +13,12 @@ var async = require('async');
 router.get('/:pid',function (req,res) {
     if (req.params.pid) {
         ScoreComment.getCommentsByPId(req.params.pid,function (results) {
+            console.log(results);
+            if (!results){
+                var jsonResult = {success:true,results:[],count:0};
+                res.json(jsonResult);
+                return;
+            }
             async.mapLimit(results,1,function (item,callback) {
                 ScoreComment.getCommentsByPId(item._id,function (commentResults) {
                     for (var j = 0; j < commentResults.length; j++) {

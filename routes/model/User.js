@@ -80,4 +80,9 @@ UserSchma.statics.getItemsByConditions = function (conditions,cb) {
 UserSchma.statics.getUpdateUsers = function (lastTime,cb) {
     this.find({'updateTime':{$gt:lastTime}}).then(cb);
 };
+
+UserSchma.statics.getAdmins = function (cb) {
+    this.find({'admin':"1"}).then(cb);
+};
+
 module.exports = db.model('user', UserSchma);

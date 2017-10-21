@@ -78,6 +78,41 @@ router.get('/:page', function(req, res) {
     });
 });
 
+router.get('/hot/:type', function(req, res) {
+    // var page = req.params["page"];
+    var type = req.params.type;
+
+    var pageSize = 20;
+
+    Score.getHotScoresByType(type,function (results) {
+
+        var handleResults = new Array();
+        var len = 0 ;
+        if (results.length >= pageSize){
+            len = pageSize;
+        }else{
+            len = results.length;
+        }
+
+        for (var i = 0; i < len; i++) {
+            results[i].fromTime = config.preTime(results[i].issueTime);
+            handleResults.push(results[i]);
+        }
+        var sortedResults = handleResults.sort(function (o, t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        var jsonResult = {success: true,  results: sortedResults};
+        res.json(jsonResult);
+        return;
+    });
+});
+
 router.get('/type/:type/:page', function(req, res) {
     // var page = req.params["page"];
     var type = req.params.type;
@@ -85,7 +120,7 @@ router.get('/type/:type/:page', function(req, res) {
     var pageSize = 20;
 
     Score.getScoresByType(type,function (results) {
-        console.log(results);
+        // console.log(results);
         var handleResults = new Array();
         var len = 0 ;
         if (results.length >= page*pageSize){
@@ -112,6 +147,67 @@ router.get('/type/:type/:page', function(req, res) {
             }
         });
         var jsonResult = {success: true, page:page, results: sortedResults, count: results.length};
+        res.json(jsonResult);
+        return;
+    });
+});
+
+router.get('/search/:type/:key', function(req, res) {
+    // var page = req.params["page"];
+    var type = req.params.type;
+    var key = req.params.key;
+    Score.getScoresByTypeAndKey(type,key,function (results) {
+        console.log(results);
+        var handleResults = new Array();
+        for (var i = 0; i < results.length; i++) {
+            results[i].fromTime = config.preTime(results[i].issueTime);
+            handleResults.push(results[i]);
+        }
+        var sortedResults = handleResults.sort(function (o, t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        var jsonResult = {success: true, results: sortedResults};
+        res.json(jsonResult);
+        return;
+    });
+});
+
+router.post('/fitler/:type', function(req, res) {
+
+    var type = req.params.type;
+    var body = req.body;
+    var requestJson = body;
+    if (typeof body === 'string') {
+        requestJson = JSON.parse(body);
+    }
+
+    var lvl = requestJson["lvl"];
+    var region = requestJson["region"];
+    var style = requestJson["style"];
+
+    Score.getScoresByTypeAndSelect(type,lvl,region,style,function (results) {
+
+        var handleResults = new Array();
+        for (var i = 0; i < results.length; i++) {
+            results[i].fromTime = config.preTime(results[i].issueTime);
+            handleResults.push(results[i]);
+        }
+        var sortedResults = handleResults.sort(function (o, t) {
+            var oT = new Date(o.issueTime);
+            var tT = new Date(t.issueTime);
+            if (oT > tT) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        var jsonResult = {success: true, results: sortedResults};
         res.json(jsonResult);
         return;
     });
