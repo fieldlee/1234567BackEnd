@@ -41,6 +41,46 @@ router.get('/', function(req, res) {
         var jsonResult = {success:true,results:sortedResults};
         res.json(jsonResult);
     });
+
+});
+
+router.get('/mobile/:type/:time', function(req, res) {
+
+    const time = new Number(req.params.time);
+    const type = req.params.type;
+    console.log("type:"+type);
+    if (time == 0){
+        Forum.getAllByType(type,function (results) {
+            var sortedResults = results.sort(function (o,t) {
+                var oT = new Date(o.issueTime);
+                var tT = new Date(t.issueTime);
+                if (oT > tT){
+                    return -1;
+                }else{
+                    return 1;
+                }
+            });
+            var jsonResult = {"success":true,"results":sortedResults};
+            res.json(jsonResult);
+        });
+    }else{
+
+        const searchTime = new Date(time);
+
+        Forum.getForumsByTime(searchTime,type,function (results) {
+            var sortedResults = results.sort(function (o,t) {
+                var oT = new Date(o.issueTime);
+                var tT = new Date(t.issueTime);
+                if (oT > tT){
+                    return -1;
+                }else{
+                    return 1;
+                }
+            });
+            var jsonResult = {"success":true,"results":sortedResults};
+            res.json(jsonResult);
+        });
+    }
 });
 
 router.get('/:type/:page', function(req, res) {
@@ -94,7 +134,6 @@ router.get('/:type/:page', function(req, res) {
                 });
             }
         },function (err,Results) {
-
             var returnResults = Results.one.concat(Results.two);
             var jsonResult = {success:true,page:page,results:returnResults,count:returnResults.length};
             res.json(jsonResult);

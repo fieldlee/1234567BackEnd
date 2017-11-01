@@ -53,6 +53,10 @@ ScoreSchma.statics.getScoresByType = function (type,cb) {
     this.find({'type':type}).sort({"issueTime":-1}).then(cb);
 };
 
+ScoreSchma.statics.getScoresByTime = function (type,time,cb) {
+    this.find({'type':type,"issueTime":{$gt:time}}).sort({"issueTime":-1}).then(cb);
+};
+
 ScoreSchma.statics.getHotScoresByType = function (type,cb) {
     this.find({'type':type}).sort({"read":1}).then(cb);
 };

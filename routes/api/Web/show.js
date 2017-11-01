@@ -7,7 +7,6 @@ var config = require('../../api/config');
 // req.params.type
 router.get('/', function(req, res) {
     Show.getAll(function (results) {
-
         //保密删除 身份证信息。
         for (var i=0;i<results.length;i++){
             results[i].idcard = "";
@@ -171,14 +170,12 @@ router.post('/close',function(req, res){
         });
     }
 });
-
 router.post('/', function(req, res) {
     var body = req.body;
     var requestJson = body;
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-
     if (requestJson["_id"] != null && requestJson["_id"] != "" && requestJson["_id"] != undefined){
         Show.getShowById(requestJson["_id"],function (result) {
             result.sign =   requestJson["sign"];
@@ -246,6 +243,4 @@ router.post('/delete', function(req, res) {
         });
     }
 });
-
-
 module.exports = router;

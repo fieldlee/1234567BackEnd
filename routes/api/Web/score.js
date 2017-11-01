@@ -22,6 +22,51 @@ router.get('/number',function (req,res) {
         }
     });
 });
+
+router.get('/mobile/:type/:time',function (req,res) {
+    const time = new Number(req.params.time);
+    const type = req.params.type;
+    if (time == 0){
+        Score.getScoresByType(type,function (results) {
+
+            console.log("type:"+type);
+            console.log("results:"+results.length);
+            var sortedResults = results.sort(function (o,t) {
+                var oT = new Date(o.issueTime);
+                var tT = new Date(t.issueTime);
+                if (oT > tT){
+                    return -1;
+                }else{
+                    return 1;
+                }
+            });
+
+            const jsonResult = {"success":true,"results":sortedResults};
+            res.json(jsonResult);
+            return;
+        });
+    }else{
+        const date = new Date(time);
+        Score.getScoresByTime(type,date,function (results) {
+            console.log("type:"+type);
+            console.log("results:"+results.length);
+            var sortedResults = results.sort(function (o,t) {
+                var oT = new Date(o.issueTime);
+                var tT = new Date(t.issueTime);
+                if (oT > tT){
+                    return -1;
+                }else{
+                    return 1;
+                }
+            });
+
+            const jsonResult = {"success":true,"results":sortedResults};
+            res.json(jsonResult);
+            return;
+        });
+    }
+});
+
 router.get('/id/:id',function (req,res) {
     var id = req.params.id;
     Score.getScoreById(id,function (result) {

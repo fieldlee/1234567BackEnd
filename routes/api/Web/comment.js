@@ -18,7 +18,7 @@ router.get('/:pid',function (req,res) {
                    for (var j = 0; j < commentResults.length; j++) {
                        commentResults[j].fromTime = config.preTime(commentResults[j].issueTime);
                    }
-                   item.subComments = commentuserResults;
+                   item.subComments = commentResults;
                    callback(null,item);
                });
            },function (err,items) {
@@ -166,7 +166,12 @@ router.post('/', function(req, res) {
         comment.parentId =   requestJson["parentId"];
         comment.content =   requestJson["content"];
         comment.author =   requestJson["author"];
-        comment.issueTime =   requestJson["issueTime"];
+        if (requestJson["issueTime"]){
+            comment.issueTime =   requestJson["issueTime"];
+        }else{
+            comment.issueTime =   new Date();
+        }
+
         Forum.getForumById(requestJson["parentId"],function (t) {
             if (t != null){
                 if(t.comment){
@@ -194,7 +199,6 @@ router.post('/', function(req, res) {
             }
 
         });
-
 
         if(requestJson["author"] != null && requestJson["author"] != ""){
             User.getUserByUserName(requestJson["author"],function (user) {

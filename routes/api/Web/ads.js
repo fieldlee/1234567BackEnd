@@ -10,7 +10,6 @@ var AdsSchema = require('../../model/Ads');
 // req.params.type
 router.get('/', function(req, res) {
     AdsSchema.getAll(function (results) {
-        console.log(results);
         var jsonResult = {"success":true,"results":results};
         res.json(jsonResult);
     });

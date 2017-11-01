@@ -6,27 +6,7 @@ var config = require('../routes/api/config');
 var async = require('async');
 
 module.exports = function(io, streams) {
-    function openShow(mainid,clientid){
-        Show.getShowById(mainid,function (item) {
-            item.status = config.LiveStatus.LIVE;
-            item.mainid = clientid;
-            item.save();
-        });
-    }
 
-    function audienceJoin(mainid,clientid){
-        Show.getShowByMainId(mainid,function (item) {
-            if(item != null){
-                var members = item.members;
-                members.push(clientid);
-                item.members  = members;
-                item.add(function (err) {
-                    console.log(err);
-                });
-            }
-        });
-    }
-    
     function mleave(client,mainid) {
 
         async.series({
@@ -109,25 +89,19 @@ module.exports = function(io, streams) {
     }
 
     io.on('connection', function(client) {
-        // console.log(client);
-        console.log(streams);
         console.log('-- ' + client.id + ' joined --');
         client.emit('id', client.id);
 
         client.on('message', function (details) {
-            console.log(details);
             var otherClient = io.sockets.connected[details.to];
-
-            // if(details.type == "init"){ //如果是直播表扬 初始化
-            //     audienceJoin(details.to,client.id);//观众 加入
-            // }
 
             if (details.type == "message"){
                 if (details.room){
                     delete details.to;
                     details.from = client.id;
                     console.log(details);
-                    client.broadcast.to(details.room).emit('message',details); //广播消息
+                    io.in(details.room).emit('message',details);
+                    // client.broadcast.to(details.room).emit('message',details); //广播消息
                     return;
                 }
             }
@@ -157,8 +131,39 @@ module.exports = function(io, streams) {
         });
         // 加入房间
         client.on('joinRoom', function (options) {
-            console.log("======joinRoom =======",options.room);
-            client.join(options.room); //加入room
+            //{room:self.id,id:id}  isPresent
+            console.log("======joinRoom options =======",options);
+            if (options.room){ //根据room id 生成
+                if (options.isPresent){ //如果是主播要更新数据
+                    Show.getShowById(options.room,function (item) {
+                        item.mainid = client.id;
+                        item.status = config.LiveStatus.LIVE;
+                        item.add(function (err) {
+                            console.log("======room emit 1 =======",{"presentid":client.id});
+                            // client.broadcast.to(client.id).emit('present',{"presentid":client.id});
+                            // client.broadcast.to(options.room).emit('present',{"presentid":client.id});
+                            io.to(options.room).emit('present',{"presentid":client.id});
+                        });
+                    })
+                }else{
+                    Show.getShowById(options.room,function (item) {
+                        // item.mainid 主播id
+                        if (item != null){
+                            var members = item.members;
+                            members.push(client.id);
+                            item.members  = members;
+                            item.add(function (err) {
+                                console.log("======room emit 2 =======",{"presentid":item.mainid});
+                                // client.broadcast.to(client.id).emit('present',{"presentid":item.mainid});
+                                // client.broadcast.to(options.room).emit('present',{"presentid":item.mainid});
+                                io.to(options.room).emit('present',{"presentid":item.mainid});
+                            });
+                        }
+
+                    })
+                }
+                client.join(options.room); //加入room
+            }
         });
 
         client.on('reward', function (options) {

@@ -59,4 +59,8 @@ NewsSchma.statics.getItemsByConditions = function (conditions,cb) {
     this.find(conditions).then(cb);
 };
 
+NewsSchma.statics.getNewsByTime = function (time,cb) {
+    this.find({'issueTime':{$gt:time}}).then(cb);
+};
+
 module.exports = db.model('news', NewsSchma);

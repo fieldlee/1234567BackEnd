@@ -48,6 +48,10 @@ ForumSchma.statics.getRecentForums = function (callback) {
     this.find({}).sort({"issueTime":-1}).limit(15).then(callback);
 };
 
+ForumSchma.statics.getForumsByTime = function (time,subtype,callback) {
+    this.find({"issueTime":{$gt:time},"subType":subtype}).sort({"issueTime":-1}).then(callback);
+};
+
 ForumSchma.statics.getHotForums = function (callback) {
     this.find({}).sort({"read":-1}).limit(15).then(callback);
 };
@@ -108,8 +112,12 @@ ForumSchma.statics.getAll = function (callback) {
     this.find({}).then(callback);
 };
 
-ForumSchma.statics.getForumsByIssue = function (issueTime,callback) {
-    this.find({"issueTime":{$gte:issueTime}}).then(callback);
+ForumSchma.statics.getAllByType = function (subtype,callback) {
+    this.find({"subType":subtype}).then(callback);
+};
+
+ForumSchma.statics.getForumsByIssue = function (issueTime,subtype,callback) {
+    this.find({"issueTime":{$gte:issueTime},"subType":subtype}).then(callback);
 };
 
 ForumSchma.statics.getByUsername = function (username,callback) {

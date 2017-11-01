@@ -10,6 +10,25 @@ var config = require('../config');
 var User = require('../../model/User');
 var News = require('../../model/News');
 
+router.get('/mobile/:time',function (req,res) {
+    const time = req.params.time;
+
+    if (Number(time)==0){
+        News.getAll(function (results) {
+            var jsonResult = {"success":true,"results":results};
+            res.json(jsonResult);
+            return;
+        });
+    }else{
+        const date = new Date(Number(time));
+        News.getNewsByTime(date,function (results) {
+            var jsonResult = {"success":true,"results":results};
+            res.json(jsonResult);
+            return;
+        });
+    }
+});
+
 /* GET users listing. */
 // req.params.type
 router.get('/number',function (req,res) {
@@ -22,6 +41,7 @@ router.get('/number',function (req,res) {
            return;
     });
 });
+
 router.get('/byid/:id',function (req,res) {
     var id = req.params.id;
     News.getNewsById(id,function (result) {

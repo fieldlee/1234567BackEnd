@@ -17,23 +17,24 @@ router.post('/', function(req, res) {
     if (typeof body === 'string') {
         requestJson = JSON.parse(body);
     }
-    if(config.isMail(requestJson["username"])){
-        requestJson["type"]="email"
-    }else{
-        if(config.isPhone(requestJson["username"])){
-            requestJson["type"]="phone"
-        }
-        else{
-            var jsonResult = {"success": false,"message":"请输入正确的邮箱或手机号码！"};
-            res.json(jsonResult);
-            return;
-        }
+    if(config.isPhone(requestJson["username"])){
+        requestJson["type"]="phone"
     }
+    else{
+        var jsonResult = {"success": false,"message":"请输入正确的邮箱或手机号码！"};
+        res.json(jsonResult);
+        return;
+    }
+    // if(config.isMail(requestJson["username"])){
+    //     requestJson["type"]="email"
+    // }else{
+    //
+    // }
         User.getUserByUserName(requestJson["username"],function (result) {
             if(result){
                 if (result.password == requestJson["password"]){
                     var token = config.getToken(requestJson["username"]);
-                    var jsonResult = {"success": true,"data":result,token:token};
+                    var jsonResult = {"success": true,"data":result,"token":token};
                     res.json(jsonResult);
                     return;
                 }else{
